@@ -7,16 +7,14 @@ spacegame
 
 - :code:`root`: The :code:`CMakeLists.txt` and :code:`.command` files are located directly in the root folder.
 
-  - :code:`/bin`: contains the :code: `game` executable file.
+  - :code:`/bin`: contains the :code:`game` executable file.
 
-  - :code:`/build`: contains the :code: `cmake` generated build files.
+  - :code:`/build`: contains the :code:`cmake` generated build files.
 
-  - :code:`/source`: contains the :code: `main.cpp` source file and other headers.
+  - :code:`/source`: contains the :code:`main.cpp` source file and other headers.
 
 2: cmake
 ========
-
-i didnt want to write :code:`g++ -o ./helloGit ./helloGit.cpp`, easier to push a button or to just write :code:`./helloGit.command` much time saved.
 
 .. code-block::
 
