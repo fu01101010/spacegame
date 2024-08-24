@@ -13,38 +13,53 @@ spacegame
 
   - :code:`/source`: contains the :code:`main.cpp` source file and other headers.
 
-2: cmake
-========
+2.1: stb_image
+==============
+
+we will be using :code:`stb_image` header to load images. heres what you need to do to include to the project:
+
+  - download the raw code as .h file from the repository. make sure you do it as :code:`rmb+save page as`.
+
+  - ..
+
+2.2: cmake
+==========
 
 .. code-block::
 
 	cmake_minimum_required(VERSION 3.28)
-	project("spacegame")
+        project("spacegame")
 
-	find_package(OpenGL REQUIRED)
+        find_package(OpenGL REQUIRED)
 
-	include_directories(
-		# library headers
-		"./include/"
-    	)
+        include_directories(
+                # library headers
+                "./include/"
+        )
 
-	set( GLFW_SHARED_LIB
-    		"${PROJECT_SOURCE_DIR}/libs/glfw/lib-x86_64/libglfw.3.dylib"
-	)
+        set( GLFW_SHARED_LIB
+                "${PROJECT_SOURCE_DIR}/libs/glfw/lib-x86_64/libglfw.3.dylib"
+        )
 
-	set ( ALL_LIBS 
-    		${OpenGL}
-    		${GLFW_SHARED_LIB}
-    		"-ldl"
-	)
+        set ( STB_IMAGE
+                "${PROJECT_SOURCE_DIR}/libs/stb/stb_image.cpp"	
+        )
 
-	add_executable(game 
-    		"source/glad.c"
-    		"source/main.cpp"
-    	)
+        set ( ALL_LIBS 
+                ${OpenGL}
+                ${GLFW_SHARED_LIB}
+                ${STB_IMAGE}
+                "-ldl"
+        )
 
-	target_link_libraries(game ${ALL_LIBS})
-	install(TARGETS game DESTINATION "${PROJECT_SOURCE_DIR}/bin/")
+        add_executable(game 
+                "source/glad.c"
+                "source/main.cpp"
+        )
+
+        target_link_libraries(game ${ALL_LIBS})
+        install(TARGETS game DESTINATION "${PROJECT_SOURCE_DIR}/bin/")
+
 
 3: build
 ========
