@@ -15,6 +15,7 @@
 #include <stb/stb_image.h>
 
 #include "io/mouse.h"
+#include "io/keyboard.h"
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
