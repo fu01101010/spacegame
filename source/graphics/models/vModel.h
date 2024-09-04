@@ -9,8 +9,7 @@
 
 #include <vector>
 
-error
-#include "vMesh.h"
+#include "../vMesh.h"
 
 class vModel {
 

@@ -10,8 +10,8 @@ void screen::framebufferSizeCallback(GLFWwindow* window, int width, int height) 
 
 	glViewport(0, 0, width, height);
 
-	SCR_HEIGHT = HEIGHT;
-	SCR_WIDTH = WIDTH;
+	SCR_HEIGHT = height;
+	SCR_WIDTH = width;
 }
 
 screen::screen() : window(nullptr) {}
@@ -39,7 +39,7 @@ void screen::setParameters() {
 	glfwSetKeyCallback(window, keyboard::keyCallback);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-	glfwSetCursorPosCallback(window, mouse::cursorPosCallback);
+	glfwSetCursorPosCallback(window, mouse::cursorPositionCallback);
 	glfwSetMouseButtonCallback(window, mouse::mouseButtonCallback);
 	glfwSetScrollCallback(window, mouse::mouseWheelCallback);
 

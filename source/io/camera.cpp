@@ -58,13 +58,16 @@ void camera::updateCameraPosition(cameraDirection direction, double _dt) {
 		case cameraDirection::UP: {
 
 			//cameraPosition += cameraUp * velocity;
-			cameraPosition += WorldUp * velocity;
+			cameraPosition += worldUp * velocity;
 			break;
 		}
 		case cameraDirection::DOWN: {
 
 			//cameraPosition -= cameraUp * velocity;
-			cameraPosition -= WorldUp * velocity;
+			cameraPosition -= worldUp * velocity;
+			break;
+		}
+		case cameraDirection::NONE: {
 			break;
 		}
 	}

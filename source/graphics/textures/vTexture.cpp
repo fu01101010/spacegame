@@ -2,7 +2,7 @@
 
 #include "vTexture.h"
 
-int vTexture::Currentid;
+int vTexture::currentID;
 
 vTexture::vTexture() {}
 vTexture::vTexture(const char* path, const char* name, bool defaultParameters)
@@ -25,7 +25,7 @@ void vTexture::generate() {
 
 void vTexture::load(bool flip) {
 
-	stbi_set_flip_vertically_on_load(Flip);
+	stbi_set_flip_vertically_on_load(flip);
 
 	unsigned char* data = stbi_load(tex_path, &width, &height, &nChannels, 0);
 
@@ -68,8 +68,8 @@ void vTexture::setFilters(GLenum all) {
 
 void vTexture::setFilters(GLenum mag, GLenum min) {
 
-	glTexParameteri(GL_texTURE_2D, GL_texTURE_mag_FILTER, mag);
-	glTexParameteri(GL_texTURE_2D, GL_texTURE_min_FILTER, min);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mag);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, min);
 }
 
 void vTexture::setWrap(GLenum all) {

@@ -30,14 +30,14 @@ public:
 
 private:
 
-	static double X;
-	static double Y;
+	static double x;
+	static double y;
 
 	static double lastX;
 	static double lastY;
 
-	static double DX;
-	static double DY;
+	static double dx;
+	static double dy;
 
 	static double scrollDX;
 	static double scrollDY;
