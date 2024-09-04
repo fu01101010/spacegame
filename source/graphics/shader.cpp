@@ -12,8 +12,8 @@ void shader::generate(const char* vertexShaderPath, const char* fragmentShaderPa
 	int success;
 	char infoLog[512];
 
-	GLuint vertexShader = compileShader(vertexShaderPath, GL_VERTEX_shader);
-	GLuint fragmentShader = compileShader(fragmentShaderPath, GL_FRAGMENT_shader);
+	GLuint vertexShader = compileShader(vertexShaderPath, GL_VERTEX_SHADER);
+	GLuint fragmentShader = compileShader(fragmentShaderPath, GL_FRAGMENT_SHADER);
 
 	shaderID = glCreateProgram();
 	glAttachShader(shaderID, vertexShader);
@@ -21,10 +21,10 @@ void shader::generate(const char* vertexShaderPath, const char* fragmentShaderPa
 	glLinkProgram(shaderID);
 
 	// catch errors
-	glGetShaderiv(shaderID, GL_COMPILE_STATUS, &success);
+	glGetProgramiv(shaderID, GL_LINK_STATUS, &success);
 	if (!success) {
 
-		glGetShaderInfoLog(shaderID, 512, nullptr, infoLog);
+		glGetProgramInfoLog(shaderID, 512, nullptr, infoLog);
 		std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED" << std::endl << infoLog << std::endl;
 	}
 
@@ -68,8 +68,8 @@ GLuint shader::compileShader(const char* filename, GLenum type) {
 	// create
 	GLuint retval = glCreateShader(type);
 
-	std::string shaderSrc = LoadShaderSRC(filepath);
-	const GLchar* shader = shaderSrc.c_str();
+	std::string shaderSrc = loadShaderSrc(filename);
+	const GLchar* Shader = shaderSrc.c_str();
 	glShaderSource(retval, 1, &Shader, nullptr);
 
 	// compile
@@ -79,8 +79,8 @@ GLuint shader::compileShader(const char* filename, GLenum type) {
 	glGetShaderiv(retval, GL_COMPILE_STATUS, &success);
 	if (!success) {
 
-		glGetShaderInfoLog(retval, 512, nullptr, infoLog;
-		std::cout << "ERR::SHADER::COMPILATION_FAILED@" << std::endl << filename << infoLog << std::endl;
+		glGetShaderInfoLog(retval, 512, nullptr, infoLog);
+		std::cout << "ERR::SHADER::COMPILATION_FAILED@ " << std::endl << filename << infoLog << std::endl;
 	}
 
 	return retval;
