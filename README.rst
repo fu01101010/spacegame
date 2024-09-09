@@ -41,6 +41,10 @@ we will be using :code:`stb_image` header to load images. heres what you need to
                 "${PROJECT_SOURCE_DIR}/libs/glfw/lib-x86_64/libglfw.3.dylib"
         )
 
+	set( ASSIMP_SHARED_LIB
+		"${PROJECT_SOURCE_DIR}/libs/assimp/lib-x86_64/unit"
+	)
+
         set ( STB_IMAGE
                 "${PROJECT_SOURCE_DIR}/libs/stb/stb_image.cpp"	
         )
@@ -48,6 +52,7 @@ we will be using :code:`stb_image` header to load images. heres what you need to
         set ( ALL_LIBS 
                 ${OpenGL}
                 ${GLFW_SHARED_LIB}
+		${ASSIMP}
                 ${STB_IMAGE}
                 "-ldl"
         )

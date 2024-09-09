@@ -14,6 +14,10 @@ set( GLFW_SHARED_LIB
 	"${PROJECT_SOURCE_DIR}/libs/glfw/lib-x86_64/libglfw.3.dylib"
 )
 
+set( ASSIMP_SHARED_LIB
+	"${PROJECT_SOURCE_DIR}/libs/assimp/lib-x86_64/libassimp.5.4.3.dylib"
+)
+
 set ( STB_IMAGE
 	"${PROJECT_SOURCE_DIR}/libs/stb/stb_image.cpp"	
 )
@@ -21,6 +25,7 @@ set ( STB_IMAGE
 set ( ALL_LIBS 
 	${OpenGL}
 	${GLFW_SHARED_LIB}
+	${ASSIMP_SHARED_LIB}
 	${STB_IMAGE}
 	"-ldl"
 )
@@ -31,13 +36,13 @@ add_executable(game
 	"source/graphics/material.cpp"
 	"source/graphics/shader.cpp"
 	"source/graphics/vMesh.cpp"
-	# "source/graphics/dMesh.cpp"
+	"source/graphics/dMesh.cpp"
 	"source/graphics/models/vModel.cpp"
-	# "source/graphics/models/dModel.cpp"
+	"source/graphics/models/dModel.cpp"
 	"source/graphics/models/vCube.hpp"
 	"source/graphics/models/dCube.hpp"
 	"source/graphics/models/vLightsource.hpp"
-	# "source/graphics/textures/dTexture.cpp"
+	"source/graphics/textures/dTexture.cpp"
 	"source/graphics/textures/vTexture.cpp"
 	"source/io/camera.cpp"
 	"source/io/keyboard.cpp"
