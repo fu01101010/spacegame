@@ -1,5 +1,7 @@
 #include "dMesh.h"
 
+#include <iostream>
+
 std::vector<vertex> vertex::genList(float* vertices, int nVertices) {
 
 	std::vector<vertex> retval(nVertices);
@@ -44,36 +46,56 @@ dMesh::dMesh(std::vector<vertex> vertices, std::vector<unsigned int> indices, st
 	setUp();
 }
 
+dMesh::dMesh(std::vector<vertex> vertices, std::vector<unsigned int> indices, aiColor4D diff, aiColor4D spec)
+	: vertices(vertices), indices(indices), diff(diff), spec(spec), noTex(true) {
+	
+	setUp();
+}
+
 void dMesh::render(shader Shader) {
 
-	unsigned int diffuseIDx = 0;
-	unsigned int specularIDx = 0;
+	if (noTex) {
 
-	for (unsigned int i = 0; i < textures.size(); ++i) {
+		//Shader.set4flt("Material.diffuse", diff);
+		//Shader.set4flt("Material.specular", spec);
+		Shader.set_int("noTex", 1);
+	}
+	else {
+		unsigned int diffuseIDx = 0;
+		unsigned int specularIDx = 0;
 
-		//activate textures
-		glActiveTexture(GL_TEXTURE0 + i);
+		for (unsigned int i = 0; i < textures.size(); ++i) {
 
-		//retreive texture info
-		std::string name;
+			//activate textures
+			glActiveTexture(GL_TEXTURE0 + i);
 
-		switch (textures[i].type) {
+			//retreive texture info
+			std::string number;
+			std::string name;
 
-		case aiTextureType_DIFFUSE: {
-			name = "diffuse" + std::to_string(diffuseIDx++);
-			break;
+			switch (textures[i].type) {
+
+				case aiTextureType_DIFFUSE: {
+					name = "diffuse";
+					number = std::to_string(diffuseIDx++);
+					break;
+				}
+				case aiTextureType_SPECULAR: {
+					name = "specular";
+					number = std::to_string(specularIDx++);
+					break;
+				}
+				default: {
+
+				}
+			}
+
+			//set texture values in the shader
+			Shader.set_int(name + number, i);
+
+			//bind textures
+			textures[i].bind();
 		}
-		case aiTextureType_SPECULAR: {
-			name = "specular" + std::to_string(specularIDx++);
-			break;
-		}
-		}
-
-		//set texture values in the shader
-		Shader.set_int(name, i);
-
-		//bind textures
-		textures[i].bind();
 	}
 
 	glBindVertexArray(VAO);

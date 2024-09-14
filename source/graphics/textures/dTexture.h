@@ -1,5 +1,5 @@
-#ifndef DFLT_TEXTURE_H
-#define DFLT_TEXTURE_H
+#ifndef DTEXTURE_H
+#define DTEXTURE_H
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -8,23 +8,26 @@
 
 #include <stb/stb_image.h>
 
-class DFLT_TEXTURE {
+#include <string>
+
+class dTexture {
 
 public:
 
-	DFLT_TEXTURE();
-	DFLT_TEXTURE(std::string DIRECTORY, std::string PATH, aiTextureType type);
+	dTexture();
+	dTexture(std::string directory, std::string path, aiTextureType type);
 
-	void GENERATE();
-	void LOAD(bool Flip = true);
+	void generate();
+	void load(bool flip = true);
 
-	void BIND();
+	void bind();
 
-	unsigned int ID;
+	//texture object
+	unsigned int id;
 	aiTextureType type;
 
-	std::string DIRECTORY;
-	std::string PATH;
+	std::string directory;
+	std::string path;
 };
 
 #endif

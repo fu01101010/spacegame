@@ -6,6 +6,8 @@
 
 #include <glm/glm.hpp>
 
+#include <assimp/scene.h>
+
 #include <vector>
 
 #include "shader.h"
@@ -33,14 +35,20 @@ public:
 
 	std::vector<dTexture> textures;
 
+	aiColor4D diff;
+	aiColor4D spec;
+	
 	dMesh();
 	dMesh(std::vector<vertex> vertices, std::vector<unsigned int> indices, std::vector<dTexture> textures = {});
+	dMesh(std::vector<vertex> vertices, std::vector<unsigned int> indices, aiColor4D diff, aiColor4D spec);
 
 	void render(shader Shader);
 
 	void cleanUp();
 
 private:
+
+	bool noTex;
 
 	unsigned int VBO, EBO;
 

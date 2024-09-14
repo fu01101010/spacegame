@@ -1,46 +1,49 @@
 #include <iostream>
 
-#include "DFLT_Texture.h"
+#include "dTexture.h"
 
-DFLT_TEXTURE::DFLT_TEXTURE() {}
-DFLT_TEXTURE::DFLT_TEXTURE(std::string DIRECTORY, std::string PATH, aiTextureType type)
-	: DIRECTORY(DIRECTORY), PATH(PATH), type(type){}
+dTexture::dTexture()
+	: directory(""), path(""){}
+	
+dTexture::dTexture(std::string directory, std::string path, aiTextureType type)
+	: directory(directory), path(path), type(type){
 
-void DFLT_TEXTURE::GENERATE() {
-
-	glGenTextures(1, &ID);
-	//glBindTexture(GL_TEXTURE_2D, ID??);
+	generate();	
 }
 
-void DFLT_TEXTURE::LOAD(bool Flip) {
+void dTexture::GENERATE() {
 
-	stbi_set_flip_vertically_on_load(Flip);
+	glGenTextures(1, &id);
+	//glBindTexture(GL_TEXTURE_2D, id??);
+}
 
-	int Width, Height, NChannels;
+void dTexture::load(bool flip) {
 
-	unsigned char* DATA = stbi_load((DIRECTORY + "/" + PATH).c_str(), &Width, &Height, &NChannels, 0);
+	int width, height, nChannels;
 
-	GLenum ColorMode;
-	switch (NChannels) {
+	unsigned char* data = stbi_load((directory + "/" + path).c_str(), &width, &height, &nChannels, 0);
+
+	GLenum colorMode;
+	switch (nChannels) {
 
 	case 1: {
-		ColorMode = GL_RED;
+		colorMode = GL_RED;
 		break;
 	}
 
 	case 4: {
-		ColorMode = GL_RGBA;
+		colorMode = GL_RGBA;
 		break;
 	}
 
 	default:
-		ColorMode = GL_RGB;
+		colorMode = GL_RGB;
 	}
 
-	if (DATA) {
+	if (data) {
 
-		glBindTexture(GL_TEXTURE_2D, ID);
-		glTexImage2D(GL_TEXTURE_2D, 0, ColorMode, Width, Height, 0, ColorMode, GL_UNSIGNED_BYTE, DATA);
+		glBindTexture(GL_TEXTURE_2D, id);
+		glTexImage2D(GL_TEXTURE_2D, 0, colorMode, width, height, 0, colorMode, GL_UNSIGNED_BYTE, data);
 
 		glGenerateMipmap(GL_TEXTURE_2D);
 
@@ -52,13 +55,13 @@ void DFLT_TEXTURE::LOAD(bool Flip) {
 	}
 	else {
 
-		std::cout << "Failed to load image at" << PATH << std::endl;
+		std::cout << "Failed to load image at" << path << std::endl;
 	}
 
-	stbi_image_free(DATA);
+	stbi_image_free(data);
 }
 
-void DFLT_TEXTURE::BIND() {
+void dTexture::BIND() {
 
-	glBindTexture(GL_TEXTURE_2D, ID);
+	glBindTexture(GL_TEXTURE_2D, id);
 }
