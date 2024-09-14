@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-std::vector<vertex> vertex::genList(float* vertices, int nVertices) {
+std::vector<vertex> vertex::genDList(float* vertices, int nVertices) {
 
 	std::vector<vertex> retval(nVertices);
 

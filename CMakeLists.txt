@@ -15,7 +15,7 @@ set( GLFW_SHARED_LIB
 )
 
 set( ASSIMP_SHARED_LIB
-	"${PROJECT_SOURCE_DIR}/libs/assimp/lib-x86_64/libassimp.5.4.3.dylib"
+	"${PROJECT_SOURCE_DIR}/libs/assimp/lib-x86_64/libassimp.5.dylib"
 )
 
 set ( STB_IMAGE

@@ -11,7 +11,7 @@ dTexture::dTexture(std::string directory, std::string path, aiTextureType type)
 	generate();	
 }
 
-void dTexture::GENERATE() {
+void dTexture::generate() {
 
 	glGenTextures(1, &id);
 	//glBindTexture(GL_TEXTURE_2D, id??);
@@ -61,7 +61,7 @@ void dTexture::load(bool flip) {
 	stbi_image_free(data);
 }
 
-void dTexture::BIND() {
+void dTexture::bind() {
 
 	glBindTexture(GL_TEXTURE_2D, id);
 }

@@ -1,6 +1,6 @@
 #include "vMesh.h"
 
-std::vector<vertex> vertex::genList(float* vertices, int nVertices) {
+std::vector<vertex> vertex::genVList(float* vertices, int nVertices) {
 
 	std::vector<vertex> retval(nVertices);
 

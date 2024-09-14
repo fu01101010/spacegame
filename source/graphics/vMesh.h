@@ -18,7 +18,7 @@ struct vertex {
 	glm::vec2 texCoord;
 	//glm::vec3 aColor;
 
-	static std::vector<struct vertex> genList(float* vertices, int nVertices);
+	static std::vector<struct vertex> genVList(float* vertices, int nVertices);
 };
 
 typedef struct vertex vertex;
