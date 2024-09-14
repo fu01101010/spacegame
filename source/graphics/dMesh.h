@@ -33,8 +33,8 @@ public:
 
 	std::vector<dTexture> textures;
 
-	DFLT_MESH();
-	DFLT_MESH(std::vector<vertex> vertices, std::vector<unsigned int> indices, std::vector<dTexture> textures = {});
+	dMesh();
+	dMesh(std::vector<vertex> vertices, std::vector<unsigned int> indices, std::vector<dTexture> textures = {});
 
 	void render(shader Shader);
 

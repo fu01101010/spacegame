@@ -60,11 +60,11 @@ void dMesh::render(shader Shader) {
 		switch (textures[i].type) {
 
 		case aiTextureType_DIFFUSE: {
-			name = "diffuse" + std::to_string(DiffuseIDx++);
+			name = "diffuse" + std::to_string(diffuseIDx++);
 			break;
 		}
 		case aiTextureType_SPECULAR: {
-			name = "specular" + std::to_string(SpecularIDx++);
+			name = "specular" + std::to_string(specularIDx++);
 			break;
 		}
 		}
