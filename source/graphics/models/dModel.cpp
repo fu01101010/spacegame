@@ -1,108 +1,108 @@
-#include "DFLT_Model.h"
+#include "dModel.h"
 
-DFLT_MODEL::DFLT_MODEL() {}
-DFLT_MODEL::DFLT_MODEL(glm::vec3 Position, glm::vec3 Size)
-	: Position(Position), Size(Size) { }
+dModel::dModel() {}
+dModel::dModel(glm::vec3 position, glm::vec3 size)
+	: position(position), size(size) { }
 
-void DFLT_MODEL::INIT() {}
+void dModel::init() {}
 
-void DFLT_MODEL::RENDER(SHADER SHADER) {
+void dModel::render(shader Shader) {
 
 	glm::mat4 model = glm::mat4(1.0f);
 
-	model = glm::translate(model, Position);
-	model = glm::scale(model, Size);
+	model = glm::translate(model, position);
+	model = glm::scale(model, size);
 
-	SHADER.SETMAT4("MODEL", model);
-	SHADER.SET_FLT("Material.Reflectivity", 0.5f);
+	Shader.setmat4("model", model);
+	Shader.set_flt("Material.reflectivity", 0.5f);
 
-	for (DFLT_MESH MESH : MESHES) {
+	for (dMesh mesh : meshes) {
 
-		MESH.RENDER(SHADER);
+		mesh.render(Shader);
 	}
 }
 
-void DFLT_MODEL::CleanUp() {
+void dModel::cleanUp() {
 
-	for (DFLT_MESH MESH : MESHES) {
+	for (dMesh mesh : meshes) {
 
-		MESH.CleanUp();
+		mesh.cleanUp();
 	}
 }
 
-void DFLT_MODEL::LOADModel(std::string PATH) {
+void dModel::loadModel(std::string path) {
 
 	Assimp::Importer Importer;
-	const aiScene* Scene = Importer.ReadFile(PATH, aiProcess_Triangulate | aiProcess_FlipUVs);
+	const aiScene* scene = Importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
 
-	if (!Scene || Scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !Scene->mRootNode) {
+	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
 
-		std::cout << "Could not load model at " << PATH << std::endl << Importer.GetErrorString() << std::endl;
+		std::cout << "Could not load model at " << path << std::endl << Importer.GetErrorString() << std::endl;
 		return;
 	}
 
-	DIRECTORY = PATH.substr(0, PATH.find_last_of("/"));
+	directory = path.substr(0, path.find_last_of("/"));
 
-	ProcessNODE(Scene->mRootNode, Scene);
+	processNode(scene->mRootNode, scene);
 }
 
-void DFLT_MODEL::ProcessNODE(aiNode* node, const aiScene* Scene) {
+void dModel::processNode(aiNode* node, const aiScene* scene) {
 
 	//process all meshes
 	for (unsigned int i = 0; i < node->mNumMeshes; ++i) {
 
-		aiMesh* mesh = Scene->mMeshes[node->mMeshes[i]];
+		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
 
-		MESHES.push_back(ProcessMESH(mesh, Scene));
+		meshes.push_back(processMesh(mesh, scene));
 	}
 
 	//process all child nodes
 	for (unsigned int i = 0; i < node->mNumChildren; ++i) {
 
-		ProcessNODE(node->mChildren[i], Scene);
+		processNode(node->mChildren[i], scene);
 	}
 }
 
-DFLT_MESH DFLT_MODEL::ProcessMESH(aiMesh* mesh, const aiScene* Scene) {
+dMesh dModel::processMesh(aiMesh* mesh, const aiScene* scene) {
 
-	std::vector<VERTEX> Vertices;
-	std::vector<unsigned int> Indices;
+	std::vector<vertex> vertices;
+	std::vector<unsigned int> indices;
 
-	std::vector<DFLT_TEXTURE> Textures;
+	std::vector<dTexture> textures;
 
-	//Vertices
+	//vertices
 	for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
 
-		VERTEX Vertex;
+		vertex Vertex;
 
-		//Position
-		Vertex.Position = glm::vec3(
+		//position
+		Vertex.position = glm::vec3(
 			mesh->mVertices[i].x,
 			mesh->mVertices[i].y,
 			mesh->mVertices[i].z
 		);
 
-		//Normals
-		Vertex.Normal = glm::vec3(
+		//normals
+		Vertex.normal = glm::vec3(
 			mesh->mNormals[i].x,
 			mesh->mNormals[i].y,
 			mesh->mNormals[i].z
 		);
 
-		//Textures
+		//textures
 		if (mesh->mTextureCoords[0]) {
 
-			Vertex.TexCoord = glm::vec2(
+			Vertex.texCoord = glm::vec2(
 				mesh->mTextureCoords[0][i].x,
 				mesh->mTextureCoords[0][i].y
 			);
 		}
 		else {
 
-			Vertex.TexCoord = glm::vec2(0.0f);
+			Vertex.texCoord = glm::vec2(0.0f);
 		}
 
-		Vertices.push_back(Vertex);
+		vertices.push_back(Vertex);
 	}
 
 	//Process indices
@@ -111,30 +111,30 @@ DFLT_MESH DFLT_MODEL::ProcessMESH(aiMesh* mesh, const aiScene* Scene) {
 		aiFace face = mesh->mFaces[i];
 		for (unsigned int j = 0; j < face.mNumIndices; ++j) {
 
-			Indices.push_back(face.mIndices[j]);
+			indices.push_back(face.mIndices[j]);
 		}
 	}
 
 	//Process material
 	if (mesh->mMaterialIndex >= 0) {
 
-		aiMaterial* material = Scene->mMaterials[mesh->mMaterialIndex];
+		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
 		//diffMaps
-		std::vector<DFLT_TEXTURE> diffMaps = LoadTextures(material, aiTextureType_DIFFUSE);
-		Textures.insert(Textures.end(), diffMaps.begin(), diffMaps.end());
+		std::vector<dTexture> diffMaps = loadTextures(material, aiTextureType_DIFFUSE);
+		textures.insert(textures.end(), diffMaps.begin(), diffMaps.end());
 
 		//specMaps
-		std::vector<DFLT_TEXTURE> specMaps = LoadTextures(material, aiTextureType_SPECULAR);
-		Textures.insert(Textures.end(), specMaps.begin(), specMaps.end());
+		std::vector<dTexture> specMaps = loadTextures(material, aiTextureType_SPECULAR);
+		textures.insert(textures.end(), specMaps.begin(), specMaps.end());
 	}
 
-	return DFLT_MESH(Vertices, Indices, Textures);
+	return dMesh(vertices, indices, textures);
 }
 
-std::vector<DFLT_TEXTURE> DFLT_MODEL::LoadTextures(aiMaterial* material, aiTextureType type) {
+std::vector<dTexture> dModel::loadTextures(aiMaterial* material, aiTextureType type) {
 
-	std::vector<DFLT_TEXTURE> Textures;
+	std::vector<dTexture> textures;
 
 	for (unsigned int i = 0; i < material->GetTextureCount(type); ++i) {
 
@@ -146,11 +146,11 @@ std::vector<DFLT_TEXTURE> DFLT_MODEL::LoadTextures(aiMaterial* material, aiTextu
 		//prevent duplicate loading
 		bool helperSkipFlag = false;
 
-		for (unsigned int j = 0; j < TexturesLoaded.size(); ++j) {
+		for (unsigned int j = 0; j < texturesLoaded.size(); ++j) {
 
-			if (std::strcmp(TexturesLoaded[j].PATH.data(), helperString.C_Str())) {
+			if (std::strcmp(texturesLoaded[j].path.data(), helperString.C_Str())) {
 
-				Textures.push_back(TexturesLoaded[j]);
+				textures.push_back(texturesLoaded[j]);
 
 				helperSkipFlag = true;
 				break;
@@ -160,13 +160,13 @@ std::vector<DFLT_TEXTURE> DFLT_MODEL::LoadTextures(aiMaterial* material, aiTextu
 		if (!helperSkipFlag) {
 
 			//not loaded yet
-			DFLT_TEXTURE TEX(DIRECTORY, helperString.C_Str(), type);
-			TEX.LOAD(false);
+			dTexture tex(directory, helperString.C_Str(), type);
+			tex.load(false);
 
-			Textures.push_back(TEX);
-			TexturesLoaded.push_back(TEX);
+			textures.push_back(tex);
+			texturesLoaded.push_back(tex);
 		}
 	}
 
-	return Textures;
+	return textures;
 }

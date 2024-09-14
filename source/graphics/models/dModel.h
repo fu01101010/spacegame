@@ -1,5 +1,5 @@
-#ifndef DFLT_MODEL_H
-#define DFLT_MODEL_H
+#ifndef DMODEL_H
+#define DMODEL_H
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -13,34 +13,34 @@
 
 #include <vector>
 
-#include "../../Meshes/DFLT_Mesh.h"
+#include "../dMesh.h"
 
-class DFLT_MODEL {
+class dModel {
 
 public:
-	glm::vec3 Position;
-	glm::vec3 Size;
+	glm::vec3 position;
+	glm::vec3 size;
 
-	DFLT_MODEL();
-	DFLT_MODEL(glm::vec3 Position = glm::vec3(0.0f), glm::vec3 Size = glm::vec3(1.0f));
+	dModel();
+	dModel(glm::vec3 position = glm::vec3(0.0f), glm::vec3 size = glm::vec3(1.0f));
 
-	void INIT();
-	void LOADModel(std::string PATH);
+	void init();
+	void loadModel(std::string path);
 
-	void RENDER(SHADER SHADER);
+	void render(shader Shader);
 
-	void CleanUp();
+	void cleanUp();
 
 protected:
-	std::vector<DFLT_MESH> MESHES;
-	std::string DIRECTORY;
+	std::vector<dMesh> meshes;
+	std::string directory;
 
-	std::vector<DFLT_TEXTURE> TexturesLoaded;
+	std::vector<dTexture> texturesLoaded;
 
-	void ProcessNODE(aiNode* node, const aiScene* Scene);
-	DFLT_MESH ProcessMESH(aiMesh* mesh, const aiScene* Scene);
+	void processNode(aiNode* node, const aiScene* scene);
+	dMesh processMesh(aiMesh* mesh, const aiScene* scene);
 
-	std::vector<DFLT_TEXTURE> LoadTextures(aiMaterial* material, aiTextureType type);
+	std::vector<dTexture> loadTextures(aiMaterial* material, aiTextureType type);
 };
 
 #endif
