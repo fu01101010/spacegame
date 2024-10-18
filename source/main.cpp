@@ -12,6 +12,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <stb/stb_image.h>
+
 #include "../source/graphics/shader.h"
 #include "../source/graphics/textures/vTexture.h"
 #include "../source/graphics/textures/dTexture.h"
@@ -31,13 +33,13 @@
 void processInput(double deltaTime);
 
 screen Screen;
-
 camera camera::defaultCamera(glm::vec3(0.0f, 0.0f, 3.0f));
+
+double dx, dy;
+double scrollDX, scrollDY;
 
 double deltaTime = 0.0f; // time inbetween frames
 double lastFrame = 0.0f; // time of last frame
-
-std::string loadShaderSrc(const char* filename);
 
 int main()
 {
@@ -75,8 +77,11 @@ int main()
 	Screen.setParameters();
 
 	// shaders
-	shader Shader("/Users/ulysses/Desktop/source/projects/gaussianNoiseVisual/source/shaders/core.vs", "/Users/ulysses/Desktop/source/projects/gaussianNoiseVisual/source/shaders/core.fs");
-	shader lightSourceShader("/Users/ulysses/Desktop/source/projects/gaussianNoiseVisual/source/shaders/core.vs", "/Users/ulysses/Desktop/source/projects/gaussianNoiseVisual/source/shaders/lightsource.fs");
+	shader Shader("/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/dCore.vs", "/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/dCore.fs");
+	shader lightSourceShader("/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/dCore.vs", "/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/lightsource.fs");
+
+	dModel trollModel(glm::vec3(0.0f, 0.0f, -6.0f), glm::vec3(0.05f));
+	trollModel.loadModel("/Users/ulysses/Desktop/source/projects/game/source/assets/models/lotr_troll/scene.gltf");
 
 	// lights
 	directLight DirectLight = { glm::vec3(-0.2f, -1.0f, -0.3f), glm::vec4(0.1f, 0.1f, 0.1f, 1.0f), glm::vec4(0.4f, 0.4f, 0.4f, 1.0f), glm::vec4(0.5f, 0.5f, 0.5f, 1.0f) };
@@ -110,7 +115,7 @@ int main()
 
 		SpotLight.position = camera::defaultCamera.cameraPosition;
 		SpotLight.direction = camera::defaultCamera.cameraFront;
-		SpotLight.render(Shader, 0);		
+		SpotLight.render(Shader);		
 
 		glm::mat4 view = glm::mat4(1.0f);
 		glm::mat4 projection = glm::mat4(1.0f);
@@ -123,6 +128,8 @@ int main()
 		Shader.setmat4("view", view);
 		Shader.setmat4("projection", projection);
 
+		trollModel.render(Shader);
+
 		lightSourceShader.activate();
 		lightSourceShader.setmat4("view", view);
 		lightSourceShader.setmat4("projection", projection);
@@ -131,6 +138,8 @@ int main()
 		Screen.newFrame();
 		glfwPollEvents();
 	}
+	
+	trollModel.cleanUp();
 
 	// glfw: terminate, clearing all previously allocated GLFW resources.
 
@@ -171,5 +180,20 @@ void processInput(double deltaTime) {
 	if (keyboard::key(GLFW_KEY_LEFT_SHIFT)) {
 		
 		camera::defaultCamera.updateCameraPosition(cameraDirection::DOWN, deltaTime);
+	}
+
+	dx = mouse::getDX();
+	dy = mouse::getDY();
+
+	if (dx != 0 || dy != 0) {
+
+		camera::defaultCamera.updateCameraDirection(dx, dy);
+	}
+
+	scrollDY = mouse::getScrollDY();
+
+	if (scrollDY != 0) {
+
+		camera::defaultCamera.updateCameraZoom(scrollDY);
 	}
 }

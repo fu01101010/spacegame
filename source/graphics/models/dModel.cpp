@@ -1,6 +1,5 @@
 #include "dModel.h"
 
-dModel::dModel() {}
 dModel::dModel(glm::vec3 position, glm::vec3 size)
 	: position(position), size(size) { }
 
