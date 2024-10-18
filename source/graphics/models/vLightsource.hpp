@@ -1,33 +1,33 @@
-#ifndef VERT_LIGHTSOURCE_HPP
-#define VERT_LIGHTSOURCE_HPP
+#ifndef VLIGHTSOURCE_HPP
+#define VLIGHTSOURCE_HPP
 
-#include "VERT_cube.hpp"
-#include "../../Light.h"
+#include "vCube.hpp"
+#include "../light.h"
 
-class VERT_LIGHTSOURCE : public VERT_CUBE {
+class vLightSource : public vCube {
 
 public:
 
-	glm::vec3 LightColor;
+	glm::vec3 lightColor;
 
-	//LIGHT strength
-	POINTLIGHT PointLight;
+	//Light strength
+	pointLight PointLight;
 
-	VERT_LIGHTSOURCE() {}
-	VERT_LIGHTSOURCE(
-		glm::vec3 LightColor, 
-		glm::vec3 Ambient, glm::vec3 Diffuse, glm::vec3 Specular, 
+	vLightSource() {}
+	vLightSource(
+		glm::vec3 lightColor, 
+		glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, 
 		float k0, float k1, float k2,
-		glm::vec3 Position, glm::vec3 Size)
-		:	LightColor(LightColor), 
-			PointLight({Position, k0, k1, k2, Ambient, Diffuse, Specular}),
-			VERT_CUBE(MATERIAL::white_plastic, Position, Size) {}
+		glm::vec3 position, glm::vec3 size)
+		:	lightColor(lightColor), 
+			PointLight({position, k0, k1, k2, ambient, diffuse, specular}),
+			vCube(material::white_plastic, position, size) {}
 
-	void RENDER(SHADER Shader) {
-		//SET LIGHT color
-		Shader.SET3FLT("LightColor", LightColor);
+	void render(shader Shader) {
+		//set Light color
+		Shader.set3flt("lightColor", lightColor);
 
-		VERT_CUBE::RENDER(Shader);
+		vCube::render(Shader);
 	}
 };
 

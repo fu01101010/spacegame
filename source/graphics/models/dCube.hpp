@@ -1,33 +1,33 @@
-#ifndef VERT_CUBE_HPP
-#define VERT_CUBE_HPP
+#ifndef DCUBE_HPP
+#define DCUBE_HPP
 
-#include "../DFLT_Model.h"
-#include "../../Material.h"
+#include "dModel.h"
+#include "../material.h"
 
-class DFLT_CUBE : public DFLT_MODEL {
+class dCube : public dModel {
 
 public:
 
-	glm::vec3 Position;
-	glm::vec3 Size;
+	glm::vec3 position;
+	glm::vec3 size;
 
-	MATERIAL Material;
+	material Material;
 
-	DFLT_CUBE(glm::vec3 Position = glm::vec3(0.0f), glm::vec3 Size = glm::vec3(1.0f)) 
-		: DFLT_MODEL(Position, Size) {}
+	dCube(glm::vec3 position = glm::vec3(0.0f), glm::vec3 size = glm::vec3(1.0f)) 
+		: dModel(position, size) {}
 
-	void INIT() {
+	void init() {
 
-		unsigned int NVERTICES = 36;
+		unsigned int nVertices = 36;
 
-		float VERTICES[] = {
-			//Position				Normal					TexCoord
-			-0.5f, -0.5f, -0.5f,	0.0f,  0.0f, -1.0f,		0.0f, 0.0f,
-			 0.5f, -0.5f, -0.5f,	0.0f,  0.0f, -1.0f,		1.0f, 0.0f,
-			 0.5f,  0.5f, -0.5f,	0.0f,  0.0f, -1.0f,		1.0f, 1.0f,
-			 0.5f,  0.5f, -0.5f,	0.0f,  0.0f, -1.0f,		1.0f, 1.0f,
-			-0.5f,  0.5f, -0.5f,	0.0f,  0.0f, -1.0f,		0.0f, 1.0f,
-			-0.5f, -0.5f, -0.5f,	0.0f,  0.0f, -1.0f,		0.0f, 0.0f,
+		float vertices[] = {
+			//position		Normal			TexCoord
+			-0.5f, -0.5f, -0.5f,	0.0f,  0.0f, -1.0f,	0.0f, 0.0f,
+			 0.5f, -0.5f, -0.5f,	0.0f,  0.0f, -1.0f,	1.0f, 0.0f,
+			 0.5f,  0.5f, -0.5f,	0.0f,  0.0f, -1.0f,	1.0f, 1.0f,
+			 0.5f,  0.5f, -0.5f,	0.0f,  0.0f, -1.0f,	1.0f, 1.0f,
+			-0.5f,  0.5f, -0.5f,	0.0f,  0.0f, -1.0f,	0.0f, 1.0f,
+			-0.5f, -0.5f, -0.5f,	0.0f,  0.0f, -1.0f,	0.0f, 0.0f,
 
 			-0.5f, -0.5f,  0.5f,     0.0f,  0.0f,  1.0f,	0.0f, 0.0f,
 			 0.5f, -0.5f,  0.5f,     0.0f,  0.0f,  1.0f,	1.0f, 0.0f,
@@ -65,12 +65,13 @@ public:
 			-0.5f,  0.5f, -0.5f,     0.0f,  1.0f,  0.0f,	0.0f, 1.0f
 		};
 
-		std::vector<unsigned int> INDICES(NVERTICES);
+		std::vector<unsigned int> indices(nVertices);
 
-		for (int i = 0; i < NVERTICES; ++i) {
+		for (int i = 0; i < nVertices; ++i) {
 
-			INDICES[i] = i;
+			indices[i] = i;
 		}
+
 		/*
 		TEXTURE TEX0("assets/textures/cool_antenna.jpg", "Material.Diffuse");
 		TEX0.LOAD();
@@ -78,7 +79,7 @@ public:
 		TEX1.LOAD();
 		*/
 
-		MESHES.push_back(DFLT_MESH(VERTEX::GENList(VERTICES, NVERTICES), INDICES));
+		meshes.push_back(dMesh(vertex::genDList(vertices, nVertices), indices));
 	}
 };
 

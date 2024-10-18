@@ -1,34 +1,34 @@
-#ifndef VERT_CUBE_HPP
-#define VERT_CUBE_HPP
+#ifndef VCUBE_HPP
+#define VCUBE_HPP
 
-#include "../VERT_Model.h"
-#include "../../Material.h"
+#include "../vModel.h"
+#include "../material.h"
 
-class VERT_CUBE : public VERT_MODEL {
+class vCube : public vModel {
 
 public:
 
-	glm::vec3 Position;
-	glm::vec3 Size;
+	glm::vec3 position;
+	glm::vec3 size;
 
-	MATERIAL Material;
+	material Material;
 
-	VERT_CUBE() {}
-	VERT_CUBE(MATERIAL Material, glm::vec3 Position, glm::vec3 Size) 
-		: Material(Material), Position(Position), Size(Size) {}
+	vCube() {}
+	vCube(material Material, glm::vec3 position, glm::vec3 size) 
+		: Material(Material), position(position), size(size) {}
 
-	void INIT() {
+	void init() {
 
-		unsigned int NVERTICES = 36;
+		unsigned int nVertices = 36;
 
-		float VERTICES[] = {
-			//Position				Normal					TexCoord
-			-0.5f, -0.5f, -0.5f,	0.0f,  0.0f, -1.0f,		0.0f, 0.0f,
-			 0.5f, -0.5f, -0.5f,	0.0f,  0.0f, -1.0f,		1.0f, 0.0f,
-			 0.5f,  0.5f, -0.5f,	0.0f,  0.0f, -1.0f,		1.0f, 1.0f,
-			 0.5f,  0.5f, -0.5f,	0.0f,  0.0f, -1.0f,		1.0f, 1.0f,
-			-0.5f,  0.5f, -0.5f,	0.0f,  0.0f, -1.0f,		0.0f, 1.0f,
-			-0.5f, -0.5f, -0.5f,	0.0f,  0.0f, -1.0f,		0.0f, 0.0f,
+		float vertices[] = {
+			//position		Normal			TexCoord
+			-0.5f, -0.5f, -0.5f,	0.0f,  0.0f, -1.0f,	0.0f, 0.0f,
+			 0.5f, -0.5f, -0.5f,	0.0f,  0.0f, -1.0f,	1.0f, 0.0f,
+			 0.5f,  0.5f, -0.5f,	0.0f,  0.0f, -1.0f,	1.0f, 1.0f,
+			 0.5f,  0.5f, -0.5f,	0.0f,  0.0f, -1.0f,	1.0f, 1.0f,
+			-0.5f,  0.5f, -0.5f,	0.0f,  0.0f, -1.0f,	0.0f, 1.0f,
+			-0.5f, -0.5f, -0.5f,	0.0f,  0.0f, -1.0f,	0.0f, 0.0f,
 
 			-0.5f, -0.5f,  0.5f,     0.0f,  0.0f,  1.0f,	0.0f, 0.0f,
 			 0.5f, -0.5f,  0.5f,     0.0f,  0.0f,  1.0f,	1.0f, 0.0f,
@@ -66,36 +66,36 @@ public:
 			-0.5f,  0.5f, -0.5f,     0.0f,  1.0f,  0.0f,	0.0f, 1.0f
 		};
 
-		std::vector<unsigned int> INDICES(NVERTICES);
+		std::vector<unsigned int> indices(nVertices);
 
-		for (int i = 0; i < NVERTICES; ++i) {
+		for (int i = 0; i < nVertices; ++i) {
 
-			INDICES[i] = i;
+			indices[i] = i;
 		}
 
-		VERT_TEXTURE TEX0("assets/textures/cool_antenna.jpg", "Material.Diffuse");
-		TEX0.LOAD();
-		VERT_TEXTURE TEX1("assets/textures/cool_shuttle.png", "Material.Specular");
-		TEX1.LOAD();
+		vTexture tex0("assets/textures/cool_antenna.jpg", "Material.diffuse");
+		tex0.load();
+		vTexture tex1("assets/textures/cool_shuttle.png", "Material.specular");
+		tex1.load();
 
-		MESHES.push_back(VERT_MESH(VERTEX::GENList(VERTICES, NVERTICES), INDICES, {TEX0, TEX1}));
+		meshes.push_back(vMesh(vertex::genVList(vertices, nVertices), indices, {tex0, tex1}));
 	}
 
-	void RENDER(SHADER SHADER) {
+	void render(shader Shader) {
 
-		glm::mat4 MODEL = glm::mat4(1.0f);
+		glm::mat4 model = glm::mat4(1.0f);
 
-		MODEL = glm::translate(MODEL, Position);
-		MODEL = glm::scale(MODEL, Size);
-		//MODEL = glm::rotate(MODEL, (float)glfwGetTime() * glm::radians(-45.0f), glm::vec3(0.5f));
+		model = glm::translate(model, position);
+		model = glm::scale(model, size);
+		//model = glm::rotate(model, (float)glfwGetTime() * glm::radians(-45.0f), glm::vec3(0.5f));
 
-		SHADER.SETMAT4("MODEL", MODEL);
-		SHADER.SET3FLT("Material.Ambient", Material.Ambient);
-		//SHADER.SET3FLT("Material.Diffuse", Material.Diffuse);
-		//SHADER.SET3FLT("Material.Specular", Material.Specular);
-		SHADER.SET_FLT("Material.Reflectivity", Material.Reflectivity);
+		Shader.setmat4("model", model);
+		Shader.set3flt("Material.ambient", Material.ambient);
+		//Shader.set3flt("Material.diffuse", Material.diffuse);
+		//Shader.set3flt("Material.specular", Material.specular);
+		Shader.set_flt("Material.reflectivity", Material.reflectivity);
 
-		VERT_MODEL::RENDER(SHADER);
+		vModel::render(Shader);
 	}
 };
 

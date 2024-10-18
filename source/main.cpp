@@ -12,8 +12,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include <stb/stb_image.h>
-
 #include "io/mouse.h"
 #include "io/keyboard.h"
 #include "io/screen.h"
@@ -184,6 +182,7 @@ int main()
 void processInput(double deltaTime) {
 	
 	if (keyboard::key(GLFW_KEY_ESCAPE)) {
+		
 		Screen.setShouldClose(true);
 	}
 }
