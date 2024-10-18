@@ -148,7 +148,7 @@ std::vector<dTexture> dModel::loadTextures(aiMaterial* material, aiTextureType t
 
 		for (unsigned int j = 0; j < texturesLoaded.size(); ++j) {
 
-			if (std::strcmp(texturesLoaded[j].path.data(), helperString.C_Str())) {
+			if (std::strcmp(texturesLoaded[j].path.data(), helperString.C_Str()) == 0) {
 
 				textures.push_back(texturesLoaded[j]);
 
