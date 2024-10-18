@@ -1,7 +1,7 @@
 #ifndef VCUBE_HPP
 #define VCUBE_HPP
 
-#include "../vModel.h"
+#include "vModel.h"
 #include "../material.h"
 
 class vCube : public vModel {
@@ -78,7 +78,7 @@ public:
 		vTexture tex1("assets/textures/cool_shuttle.png", "Material.specular");
 		tex1.load();
 
-		meshes.push_back(vMesh(vertex::genVList(vertices, nVertices), indices, {tex0, tex1}));
+		meshes.push_back(vMesh(vVertex::genVList(vertices, nVertices), indices, {tex0, tex1}));
 	}
 
 	void render(shader Shader) {

@@ -79,7 +79,7 @@ public:
 		TEX1.LOAD();
 		*/
 
-		meshes.push_back(dMesh(vertex::genDList(vertices, nVertices), indices));
+		meshes.push_back(dMesh(dVertex::genDList(vertices, nVertices), indices));
 	}
 };
 

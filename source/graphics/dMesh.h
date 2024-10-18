@@ -13,23 +13,23 @@
 #include "shader.h"
 #include "textures/dTexture.h"
 
-struct vertex {
+struct dVertex {
 
 	glm::vec3 position;
 	glm::vec3 normal;
 	glm::vec2 texCoord;
 	//glm::vec3 aColor;
 
-	static std::vector<struct vertex> genDList(float* vertices, int nVertices);
+	static std::vector<struct dVertex> genDList(float* vertices, int nVertices);
 };
 
-typedef struct vertex vertex;
+typedef struct dVertex dVertex;
 
 class dMesh {
 
 public:
 
-	std::vector<vertex> vertices;
+	std::vector<dVertex> vertices;
 	std::vector<unsigned int> indices;
 	unsigned int VAO;
 
@@ -39,8 +39,8 @@ public:
 	aiColor4D spec;
 	
 	dMesh();
-	dMesh(std::vector<vertex> vertices, std::vector<unsigned int> indices, std::vector<dTexture> textures = {});
-	dMesh(std::vector<vertex> vertices, std::vector<unsigned int> indices, aiColor4D diff, aiColor4D spec);
+	dMesh(std::vector<dVertex> vertices, std::vector<unsigned int> indices, std::vector<dTexture> textures = {});
+	dMesh(std::vector<dVertex> vertices, std::vector<unsigned int> indices, aiColor4D diff, aiColor4D spec);
 
 	void render(shader Shader);
 

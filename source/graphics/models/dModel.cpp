@@ -65,7 +65,7 @@ void dModel::processNode(aiNode* node, const aiScene* scene) {
 
 dMesh dModel::processMesh(aiMesh* mesh, const aiScene* scene) {
 
-	std::vector<vertex> vertices;
+	std::vector<dVertex> vertices;
 	std::vector<unsigned int> indices;
 
 	std::vector<dTexture> textures;
@@ -73,7 +73,7 @@ dMesh dModel::processMesh(aiMesh* mesh, const aiScene* scene) {
 	//vertices
 	for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
 
-		vertex Vertex;
+		dVertex Vertex;
 
 		//position
 		Vertex.position = glm::vec3(

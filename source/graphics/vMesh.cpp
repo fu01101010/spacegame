@@ -1,10 +1,10 @@
 #include "vMesh.h"
 
-std::vector<vertex> vertex::genVList(float* vertices, int nVertices) {
+std::vector<vVertex> vVertex::genVList(float* vertices, int nVertices) {
 
-	std::vector<vertex> retval(nVertices);
+	std::vector<vVertex> retval(nVertices);
 
-	int stride = sizeof(vertex) / sizeof(float);
+	int stride = sizeof(vVertex) / sizeof(float);
 
 	for (int i = 0; i < nVertices; ++i) {
 
@@ -38,7 +38,7 @@ std::vector<vertex> vertex::genVList(float* vertices, int nVertices) {
 
 vMesh::vMesh() {}
 
-vMesh::vMesh(std::vector<vertex> vertices, std::vector<unsigned int> indices, std::vector<vTexture> textures) 
+vMesh::vMesh(std::vector<vVertex> vertices, std::vector<unsigned int> indices, std::vector<vTexture> textures) 
 	: vertices(vertices), indices(indices), textures(textures) {
 
 	setUp();
@@ -78,27 +78,27 @@ void vMesh::setUp() {
 	glBindVertexArray(VAO);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(vertex), &vertices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(vVertex), &vertices[0], GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
 
 	//set pointers
-	//vertex.position
+	//vVertex.position
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), (void*)offsetof(vertex, position));
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vVertex), (void*)offsetof(vVertex, position));
 
-	//vertex.normal
+	//vVertex.normal
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), (void*)offsetof(vertex, normal));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(vVertex), (void*)offsetof(vVertex, normal));
 
-	//vertex.texCoord
+	//vVertex.texCoord
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), (void*)offsetof(vertex, texCoord));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(vVertex), (void*)offsetof(vVertex, texCoord));
 
-	//vertex.aColor
+	//vVertex.aColor
 	//glEnableVertexAttribArray(3);
-	//glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), (void*)offsetof(vertex, aColor));
+	//glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(vVertex), (void*)offsetof(vVertex, aColor));
 
 	glBindVertexArray(0);
 }

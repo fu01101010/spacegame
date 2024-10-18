@@ -12,10 +12,21 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "io/mouse.h"
-#include "io/keyboard.h"
-#include "io/screen.h"
-#include "io/camera.h"
+#include "../source/graphics/shader.h"
+#include "../source/graphics/textures/vTexture.h"
+#include "../source/graphics/textures/dTexture.h"
+#include "../source/graphics/models/vModel.h"
+#include "../source/graphics/models/dModel.h"
+#include "../source/graphics/light.h"
+
+#include "../source/graphics/models/vCube.hpp"
+#include "../source/graphics/models/dCube.hpp"
+#include "../source/graphics/models/vLightsource.hpp"
+
+#include "../source/io/mouse.h"
+#include "../source/io/keyboard.h"
+#include "../source/io/screen.h"
+#include "../source/io/camera.h"
 
 void processInput(double deltaTime);
 
@@ -64,85 +75,20 @@ int main()
 	Screen.setParameters();
 
 	// shaders
-	//Shader shader("assets/shaders/core.vs", "assets/shaders/core.fs");
-	//Shader lightSourceShader("assets/shaders/core.vs", "assets/shaders/lightsource.fs");
+	shader Shader("/Users/ulysses/Desktop/source/projects/gaussianNoiseVisual/source/shaders/core.vs", "/Users/ulysses/Desktop/source/projects/gaussianNoiseVisual/source/shaders/core.fs");
+	shader lightSourceShader("/Users/ulysses/Desktop/source/projects/gaussianNoiseVisual/source/shaders/core.vs", "/Users/ulysses/Desktop/source/projects/gaussianNoiseVisual/source/shaders/lightsource.fs");
 
-	float vertices[] = {
-		-0.5f, -0.5f, 0.0f,
-		 0.5f, -0.5f, 0.0f,
-		 0.0f,  0.5f, 0.0f
+	// lights
+	directLight DirectLight = { glm::vec3(-0.2f, -1.0f, -0.3f), glm::vec4(0.1f, 0.1f, 0.1f, 1.0f), glm::vec4(0.4f, 0.4f, 0.4f, 1.0f), glm::vec4(0.5f, 0.5f, 0.5f, 1.0f) };
+
+	spotLight SpotLight = {
+		camera::defaultCamera.cameraPosition, camera::defaultCamera.cameraFront,
+		glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(20.0f)),
+		1.0f, 0.07f, 0.032f,
+		glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), glm::vec4(1.0f), glm::vec4(1.0f)
 	};
 
-	unsigned int VBO, VAO;
-	glGenBuffers(1, &VBO);
-	glGenVertexArrays(1, &VAO);
-
-	// process vertex data via GPU
-	
-	unsigned int vertexShader;
-	vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	std::string vertexShaderSrc = loadShaderSrc("../source/shaders/vertex_core.glsl");
-
-	const char* vertexShaderSrcCSTR = vertexShaderSrc.c_str();
-
-	glShaderSource(vertexShader, 1, &vertexShaderSrcCSTR, nullptr);
-	glCompileShader(vertexShader);
-
-	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-	if (!success) {
-
-		glGetShaderInfoLog(vertexShader, 512, nullptr, infoLog);
-		std::cout << "ERR::SHADER::VERTEX::COMPILATION_FAILED" << std::endl << infoLog << std::endl;
-	}
-
-	// process fragment data
-	
-	unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	std::string fragmentShaderSrc = loadShaderSrc("../source/shaders/fragment_core.glsl");
-
-	const char* fragmentShaderSrcCSTR = fragmentShaderSrc.c_str();
-
-	glShaderSource(fragmentShader, 1, &fragmentShaderSrcCSTR, nullptr);
-	glCompileShader(fragmentShader);
-
-	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-	if (!success) {
-
-		glGetShaderInfoLog(fragmentShader, 512, nullptr, infoLog);
-		std::cout << "ERR::SHADER::FRAGMENT::COMPILATION_FAILED" << std::endl << infoLog << std::endl;
-	}
-	
-	// shader programs
-
-	unsigned int shaderProgram = glCreateProgram();
-
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram);
-
-	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-	if (!success) {
-		glGetProgramInfoLog(shaderProgram, 512, nullptr, infoLog);
-		std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED" << std::endl << infoLog << std::endl;
-	}
-
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
-
-	// interpret vertex data via GPU
-
-	glBindVertexArray(VAO);
-
-	// put vertices in buffer
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	// set vertex attribute pointers
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-
 	// render loop
-
 	while (!Screen.shouldClose()) {
 		
 		// calculate deltaTime
@@ -150,21 +96,36 @@ int main()
 		deltaTime = currentTime - lastFrame;
 		lastFrame = currentTime;
 
-		// input
-		
-		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
-
-		// use shader program
-		glUseProgram(shaderProgram);
-		glBindVertexArray(VAO);
-
-		// draw triangle
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-
+		// process input
 		processInput(deltaTime);
 
-		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
+		// render
+		Screen.update();
+		
+		Shader.activate();
+
+		Shader.set3flt("viewPos", camera::defaultCamera.cameraPosition);
+
+		DirectLight.render(Shader);
+
+		SpotLight.position = camera::defaultCamera.cameraPosition;
+		SpotLight.direction = camera::defaultCamera.cameraFront;
+		SpotLight.render(Shader, 0);		
+
+		glm::mat4 view = glm::mat4(1.0f);
+		glm::mat4 projection = glm::mat4(1.0f);
+		view = camera::defaultCamera.getViewMatrix();
+		projection = glm::perspective(
+			glm::radians(camera::defaultCamera.zoom), 
+			(float)screen::SCR_WIDTH / (float)screen::SCR_HEIGHT, 0.1f, 100.0f
+		);
+
+		Shader.setmat4("view", view);
+		Shader.setmat4("projection", projection);
+
+		lightSourceShader.activate();
+		lightSourceShader.setmat4("view", view);
+		lightSourceShader.setmat4("projection", projection);
 
 		// send new frame to window
 		Screen.newFrame();
@@ -185,29 +146,30 @@ void processInput(double deltaTime) {
 		
 		Screen.setShouldClose(true);
 	}
-}
 
-// glfw: whenever the window size changed (by OS or user resize) this callback function executes
+	// move camera
+	if (keyboard::key(GLFW_KEY_E)) {
 
-std::string loadShaderSrc(const char* filename) {
-
-	std::ifstream fromfile;
-	std::stringstream buffer;
-
-	std::string retval = "";
-
-	fromfile.open(filename);
-
-	if (fromfile.is_open()) {
-		buffer << fromfile.rdbuf();
-
-		retval = buffer.str();
+		camera::defaultCamera.updateCameraPosition(cameraDirection::FORWARD, deltaTime);
 	}
-	else {
-		std::cout << "ERROR::SHADER::COULD_NOT_OPEN_FILE: " << filename << std::endl;
+	if (keyboard::key(GLFW_KEY_D)) {
+
+		camera::defaultCamera.updateCameraPosition(cameraDirection::BACKWARD, deltaTime);
 	}
+	if (keyboard::key(GLFW_KEY_F)) {
 
-	fromfile.close();
+		camera::defaultCamera.updateCameraPosition(cameraDirection::RIGHT, deltaTime);
+	}
+	if (keyboard::key(GLFW_KEY_S)) {
 
-	return retval;
+		camera::defaultCamera.updateCameraPosition(cameraDirection::LEFT, deltaTime);
+	}
+	if (keyboard::key(GLFW_KEY_SPACE)) {
+
+		camera::defaultCamera.updateCameraPosition(cameraDirection::UP, deltaTime);
+	}
+	if (keyboard::key(GLFW_KEY_LEFT_SHIFT)) {
+		
+		camera::defaultCamera.updateCameraPosition(cameraDirection::DOWN, deltaTime);
+	}
 }
