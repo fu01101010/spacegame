@@ -73,9 +73,9 @@ public:
 			indices[i] = i;
 		}
 
-		vTexture tex0("assets/textures/cool_antenna.jpg", "Material.diffuse");
+		vTexture tex0("../../assets/textures/cool_antenna.jpg", "Material.diffuse");
 		tex0.load();
-		vTexture tex1("assets/textures/cool_shuttle.png", "Material.specular");
+		vTexture tex1("../../assets/textures/cool_shuttle.png", "Material.specular");
 		tex1.load();
 
 		meshes.push_back(vMesh(vVertex::genVList(vertices, nVertices), indices, {tex0, tex1}));
