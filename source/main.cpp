@@ -44,7 +44,7 @@ double scrollDX, scrollDY;
 double deltaTime = 0.0f; // time inbetween frames
 double lastFrame = 0.0f; // time of last frame
 
-vCube_notex VCube = vCube_notex(material::emerald, glm::vec3(0.0f), glm::vec3(1.4f));
+vCube VCube = vCube(material::emerald, glm::vec3(0.0f), glm::vec3(1.4f));
 
 int main()
 {
@@ -85,8 +85,8 @@ int main()
 	shader Shader("/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/dCore.vs", "/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/dCore.fs");
 	shader lightSourceShader("/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/vCore.vs", "/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/lightsource.fs");
 
-	dModel trollModel(glm::vec3(0.0f, 0.0f, -6.0f), glm::vec3(0.05f));
-	trollModel.loadModel("/Users/ulysses/Desktop/source/projects/game/source/assets/models/lotr_troll/scene.gltf");
+	//dModel trollModel(glm::vec3(0.0f, 0.0f, -6.0f), glm::vec3(0.05f));
+	//trollModel.loadModel("/Users/ulysses/Desktop/source/projects/game/source/assets/models/lotr_troll/scene.gltf");
 
 	// lights
 	directLight DirectLight = { glm::vec3(-0.2f, -1.0f, -0.3f), glm::vec4(0.1f, 0.1f, 0.1f, 1.0f), glm::vec4(0.4f, 0.4f, 0.4f, 1.0f), glm::vec4(0.5f, 0.5f, 0.5f, 1.0f) };
@@ -149,7 +149,7 @@ int main()
 		glfwPollEvents();
 	}
 	
-	trollModel.cleanUp();
+	//trollModel.cleanUp();
 	VCube.cleanUp();
 
 	// glfw: terminate, clearing all previously allocated GLFW resources.

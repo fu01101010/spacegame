@@ -24,13 +24,6 @@ std::vector<vVertex> vVertex::genVList(float* vertices, int nVertices) {
 			vertices[i * stride + 6],
 			vertices[i * stride + 7]
 		);
-		/*
-		retval[i].aColor = glm::vec3(
-			vertices[i * stride + 8],
-			vertices[i * stride + 9],
-			vertices[i * stride + 10]
-		);
-		*/
 	}
 
 	return retval;
@@ -49,10 +42,12 @@ void vMesh::render(shader Shader) {
 	//textures
 	for (unsigned int i = 0; i < textures.size(); ++i) {
 
-		Shader.set_int(textures[i].tex_name, textures[i].tex_id);
+		Shader.set_int(textures[i].texName, textures[i].texID);
 
-		glActiveTexture(GL_TEXTURE0 + i);
-		textures[i].bind();
+		textures[i].activate();
+
+		glBindTexture(GL_TEXTURE_2D, textures[i].texID);
+		// make it into a function (tex[i].bind())
 	}
 
 	glBindVertexArray(VAO);
@@ -76,8 +71,14 @@ void vMesh::setUp() {
 	glGenBuffers(1, &EBO);
 
 	glBindVertexArray(VAO);
+	// load data into vertex buffers
+
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	// A great thing about structs is that their memory layout is sequential for all its items.
+	// The effect is that we can simply pass a pointer to the struct and it translates perfectly to a glm::vec3/2 array which
+	// again translates to 3/2 floats which translates to a byte array.
+
 	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(vVertex), &vertices[0], GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
@@ -95,10 +96,6 @@ void vMesh::setUp() {
 	//vVertex.texCoord
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(vVertex), (void*)offsetof(vVertex, texCoord));
-
-	//vVertex.aColor
-	//glEnableVertexAttribArray(3);
-	//glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(vVertex), (void*)offsetof(vVertex, aColor));
 
 	glBindVertexArray(0);
 }

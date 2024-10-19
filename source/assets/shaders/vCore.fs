@@ -1,15 +1,13 @@
 #version 330 core
 
-vec3 calculatePointLight(int IDx, vec3 normal, vec3 viewDir);
-vec3 calculateDirectLight(vec3 normal, vec3 viewDir);
-vec3 calculateSpotLight(vec3 normal, vec3 viewDir);
+vec3 calculatePointLight(int IDx, vec3 normal, vec3 viewDir, vec3 tex);
+vec3 calculateDirectLight(vec3 normal, vec3 viewDir, vec3 tex);
+vec3 calculateSpotLight(vec3 normal, vec3 viewDir, vec3 tex);
 
 struct material {
 
-	vec3 ambient;
-	vec3 diffuse;
-	vec3 specular;
-
+	sampler2D diffuse;
+	sampler2D specular;
 	float reflectivity;
 };
 
@@ -61,7 +59,7 @@ out vec4 fragmentColor;
 
 in vec3 vsOutFragPos;
 in vec3 vsOutNormal;
-in vec3 vsOutColor;
+in vec2 vsOutTexCoord;
 
 uniform material Material;
 
@@ -72,27 +70,30 @@ void main() {
 	vec3 normal	= normalize(vsOutNormal);
 	vec3 viewDir	= normalize(viewPos - vsOutFragPos);
 
+	// texture
+	vec3 texture = vec3(texture(Material.diffuse, vsOutTexCoord));
+
 	vec3 retval;
 
 	//DirectLight
-	retval = calculateDirectLight(normal, viewDir);
+	retval = calculateDirectLight(normal, viewDir, texture);
 
 	//PointLight
 	for (int i = 0; i < nPointLights; ++i) {
 
-		retval += calculatePointLight(i, normal, viewDir);
+		retval += calculatePointLight(i, normal, viewDir, texture);
 	}
 
 	//SpotLight	
-	retval += calculateSpotLight(normal, viewDir);
+	retval += calculateSpotLight(normal, viewDir, texture);
 
 	fragmentColor = vec4(retval, 1.0); 
 }
 
-vec3 calculatePointLight(int IDx, vec3 normal, vec3 viewDir)  {
+vec3 calculatePointLight(int IDx, vec3 normal, vec3 viewDir, vec3 tex)  {
 
 	//ambient PointLight
-	vec3 ambient = PointLights[IDx].ambient * Material.ambient;
+	vec3 ambient = PointLights[IDx].ambient * tex;
 
 
 	//diffused PointLight
@@ -100,7 +101,7 @@ vec3 calculatePointLight(int IDx, vec3 normal, vec3 viewDir)  {
 
 	float diffComponent = max(dot(normal, pointLightDir), 0.0);
 
-	vec3 diffuse = PointLights[IDx].diffuse * (diffComponent * Material.diffuse); //if diffuse -> vec3
+	vec3 diffuse = PointLights[IDx].diffuse * (diffComponent * vec3(texture(Material.diffuse, vsOutTexCoord)));
 
 
 	//specular PointLight
@@ -108,7 +109,7 @@ vec3 calculatePointLight(int IDx, vec3 normal, vec3 viewDir)  {
 
 	float specComponent = pow(max(dot(viewDir, reflectDir), 0.0), Material.reflectivity * 128);
 
-	vec3 specular = PointLights[IDx].specular * (specComponent * Material.specular); //if specular -> vec3
+	vec3 specular = PointLights[IDx].specular * (specComponent * vec3(texture(Material.specular, vsOutTexCoord))); //if specular -> vec3
 
 
 	//attenuation
@@ -118,10 +119,10 @@ vec3 calculatePointLight(int IDx, vec3 normal, vec3 viewDir)  {
 	return vec3(ambient + diffuse + specular) * attenuation;
 }
 
-vec3 calculateDirectLight(vec3 normal, vec3 viewDir) {
+vec3 calculateDirectLight(vec3 normal, vec3 viewDir, vec3 tex) {
 
 	//ambient DirectLight
-	vec3 ambient = DirectLight.ambient * Material.ambient;
+	vec3 ambient = DirectLight.ambient * tex;
 
 
 	//diffused DirectLight
@@ -129,7 +130,7 @@ vec3 calculateDirectLight(vec3 normal, vec3 viewDir) {
 
 	float diffComponent = max(dot(normal, directLightDir), 0.0);
 
-	vec3 diffuse = DirectLight.diffuse * (diffComponent * Material.diffuse); //if diffuse -> vec3
+	vec3 diffuse = DirectLight.diffuse * (diffComponent * vec3(texture(Material.diffuse, vsOutTexCoord)));
 
 
 	//specular 
@@ -137,16 +138,16 @@ vec3 calculateDirectLight(vec3 normal, vec3 viewDir) {
 
 	float specComponent = pow(max(dot(viewDir, reflectDir), 0.0), Material.reflectivity * 128);
 
-	vec3 specular = DirectLight.specular * (specComponent * Material.specular); //if specular -> vec3
+	vec3 specular = DirectLight.specular * (specComponent * vec3(texture(Material.specular, vsOutTexCoord)));
 
 
 	return vec3(ambient + diffuse + specular);
 }
 
-vec3 calculateSpotLight(vec3 normal, vec3 viewDir) {
+vec3 calculateSpotLight(vec3 normal, vec3 viewDir, vec3 tex) {
 
 	//ambient SpotLight
-	vec3 ambient = SpotLight.ambient * Material.ambient;
+	vec3 ambient = SpotLight.ambient * tex;
 
 	vec3 spotLightDir = normalize(SpotLight.position - vsOutFragPos);
 
@@ -157,14 +158,14 @@ vec3 calculateSpotLight(vec3 normal, vec3 viewDir) {
 
 		//diffused SpotLight
 		float diffComponent = max(dot(normal, spotLightDir), 0.0);
-		vec3 diffuse = SpotLight.diffuse * (diffComponent * Material.diffuse);
+		vec3 diffuse = SpotLight.diffuse * (diffComponent * vec3(texture(Material.diffuse, vsOutTexCoord)));
 
 
 		//specular SpotLight
 		vec3 reflectDir = reflect(-spotLightDir, normal);
 
 		float specComponent = pow(max(dot(viewDir, reflectDir), 0.0), Material.reflectivity * 128);
-		vec3 specular = SpotLight.specular * (specComponent * Material.specular);
+		vec3 specular = SpotLight.specular * (specComponent * vec3(texture(Material.specular, vsOutTexCoord)));
 
 
 		//intensity

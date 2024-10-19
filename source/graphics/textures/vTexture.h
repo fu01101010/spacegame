@@ -21,19 +21,21 @@ public:
 
 	void setWrap(GLenum all);
 	void setWrap(GLenum s, GLenum t);
+	
+	void setBorderColor(float borderColor[4]);
 
-	void bind();
+	void activate();
 
 	// tex object
-	int tex_id;
+	int texID;
 	unsigned tex;
-	const char* tex_name;
+	const char* texName;
 
 private:
 
 	static int currentID;
 
-	const char* tex_path;
+	const char* texPath;
 	int width;
 	int height;
 	int nChannels;

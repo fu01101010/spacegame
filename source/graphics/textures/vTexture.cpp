@@ -2,11 +2,11 @@
 
 #include "vTexture.h"
 
-int vTexture::currentID;
+int vTexture::currentID = 0;
 
-vTexture::vTexture() {}
+vTexture::vTexture() : texPath(""), texName(""), texID(-1), width(0), height(0), nChannels(0) {}
 vTexture::vTexture(const char* path, const char* name, bool defaultParameters)
-	: tex_path(path), tex_name(name), tex_id(currentID++) {
+	: texPath(path), texName(name), texID(currentID++) {
 
 	generate();
 
@@ -27,7 +27,7 @@ void vTexture::load(bool flip) {
 
 	stbi_set_flip_vertically_on_load(flip);
 
-	unsigned char* data = stbi_load(tex_path, &width, &height, &nChannels, 0);
+	unsigned char* data = stbi_load(texPath, &width, &height, &nChannels, 0);
 
 	GLenum colorMode;
 	switch (nChannels) {
@@ -48,14 +48,14 @@ void vTexture::load(bool flip) {
 
 	if (data) {
 
-		glBindTexture(GL_TEXTURE_2D, tex_id);
+		glBindTexture(GL_TEXTURE_2D, texID);
 		glTexImage2D(GL_TEXTURE_2D, 0, colorMode, width, height, 0, colorMode, GL_UNSIGNED_BYTE, data);
 
 		glGenerateMipmap(GL_TEXTURE_2D); 
 	}
 	else {
 
-		std::cout << "Failed to load image@ " << tex_path << std::endl;
+		std::cout << "Failed to load image@ " << texPath << std::endl;
 	}
 
 	stbi_image_free(data);
@@ -83,7 +83,12 @@ void vTexture::setWrap(GLenum s, GLenum t) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, t);
 }
 
-void vTexture::bind() {
+void vTexture::activate() {
 
-	glBindTexture(GL_TEXTURE_2D, tex_id);
+	glActiveTexture(GL_TEXTURE0 + texID);
+}
+
+void vTexture::setBorderColor(float borderColor[4]) {
+	
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 }

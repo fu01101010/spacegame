@@ -73,9 +73,9 @@ public:
 			indices[i] = i;
 		}
 
-		vTexture tex0("../../assets/textures/cool_antenna.jpg", "Material.diffuse");
+		vTexture tex0("/Users/ulysses/Desktop/source/projects/game/source//assets/textures/cool_antenna.jpg", "Material.diffuse");
 		tex0.load();
-		vTexture tex1("../../assets/textures/cool_shuttle.png", "Material.specular");
+		vTexture tex1("/Users/ulysses/Desktop/source/projects/game/source/assets/textures/cool_shuttle.png", "Material.specular");
 		tex1.load();
 
 		meshes.push_back(vMesh(vVertex::genVList(vertices, nVertices), indices, {tex0, tex1}));
@@ -90,9 +90,9 @@ public:
 		//model = glm::rotate(model, (float)glfwGetTime() * glm::radians(-45.0f), glm::vec3(0.5f));
 
 		Shader.setmat4("model", model);
-		Shader.set3flt("Material.ambient", Material.ambient);
-		//Shader.set3flt("Material.diffuse", Material.diffuse);
-		//Shader.set3flt("Material.specular", Material.specular);
+		//Shader.set3flt("Material.ambient", Material.ambient);
+		Shader.set_int("Material.diffuse", meshes[0].textures[0].texID);
+		Shader.set_int("Material.specular", meshes[0].textures[1].texID);
 		Shader.set_flt("Material.reflectivity", Material.reflectivity);
 
 		vModel::render(Shader);

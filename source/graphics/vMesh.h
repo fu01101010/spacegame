@@ -16,7 +16,6 @@ struct vVertex {
 	glm::vec3 position;
 	glm::vec3 normal;
 	glm::vec2 texCoord;
-	//glm::vec3 aColor;
 
 	static std::vector<struct vVertex> genVList(float* vertices, int nVertices);
 };
@@ -34,7 +33,7 @@ public:
 	std::vector<vTexture> textures;
 
 	vMesh();
-	vMesh(std::vector<vVertex> vertices, std::vector<unsigned int> indices, std::vector<vTexture> textures);
+	vMesh(std::vector<vVertex> vertices, std::vector<unsigned int> indices, std::vector<vTexture> textures = {});
 
 	void render(shader Shader);
 
