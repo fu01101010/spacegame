@@ -44,7 +44,7 @@ double scrollDX, scrollDY;
 double deltaTime = 0.0f; // time inbetween frames
 double lastFrame = 0.0f; // time of last frame
 
-vCube VCube = vCube(material::emerald, glm::vec3(0.0f), glm::vec3(1.4f));
+//vCube VCube = vCube(material::emerald, glm::vec3(0.0f), glm::vec3(1.4f));
 
 int main()
 {
@@ -85,8 +85,8 @@ int main()
 	shader Shader("/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/dCore.vs", "/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/dCore.fs");
 	shader lightSourceShader("/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/vCore.vs", "/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/lightsource.fs");
 
-	//dModel trollModel(glm::vec3(0.0f, 0.0f, -6.0f), glm::vec3(0.05f));
-	//trollModel.loadModel("/Users/ulysses/Desktop/source/projects/game/source/assets/models/lotr_troll/scene.gltf");
+	dModel trollModel(glm::vec3(0.0f, 0.0f, -6.0f), glm::vec3(0.05f));
+	trollModel.loadModel("/Users/ulysses/Desktop/source/projects/game/source/assets/models/lotr_troll/scene.gltf");
 
 	// lights
 	directLight DirectLight = { glm::vec3(-0.2f, -1.0f, -0.3f), glm::vec4(0.1f, 0.1f, 0.1f, 1.0f), glm::vec4(0.4f, 0.4f, 0.4f, 1.0f), glm::vec4(0.5f, 0.5f, 0.5f, 1.0f) };
@@ -100,7 +100,7 @@ int main()
 	
 	shader vShader("/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/vCore.vs", "/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/vCore.fs");
 	
-	VCube.init();
+	//VCube.init();
 
 	// render loop
 	while (!Screen.shouldClose()) {
@@ -116,9 +116,9 @@ int main()
 		// render
 		Screen.update();
 		
-		vShader.activate();
+		Shader.activate();
 
-		vShader.set3flt("viewPos", camera::defaultCamera.cameraPosition);
+		Shader.set3flt("viewPos", camera::defaultCamera.cameraPosition);
 
 		DirectLight.render(Shader);
 
@@ -134,11 +134,11 @@ int main()
 			(float)screen::SCR_WIDTH / (float)screen::SCR_HEIGHT, 0.1f, 100.0f
 		);
 
-		vShader.setmat4("view", view);
-		vShader.setmat4("projection", projection);
+		Shader.setmat4("view", view);
+		Shader.setmat4("projection", projection);
 
-		//trollModel.render(Shader);
-		VCube.render(vShader);
+		trollModel.render(Shader);
+		//VCube.render(vShader);
 
 		lightSourceShader.activate();
 		lightSourceShader.setmat4("view", view);
@@ -149,8 +149,8 @@ int main()
 		glfwPollEvents();
 	}
 	
-	//trollModel.cleanUp();
-	VCube.cleanUp();
+	trollModel.cleanUp();
+	//VCube.cleanUp();
 
 	// glfw: terminate, clearing all previously allocated GLFW resources.
 
