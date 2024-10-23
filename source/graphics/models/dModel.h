@@ -21,7 +21,7 @@ public:
 	glm::vec3 position;
 	glm::vec3 size;
 
-	dModel(glm::vec3 position = glm::vec3(0.0f), glm::vec3 size = glm::vec3(1.0f));
+	dModel(glm::vec3 position = glm::vec3(0.0f), glm::vec3 size = glm::vec3(1.0f), bool noTex = false);
 
 	void init();
 	void loadModel(std::string path);
@@ -31,6 +31,8 @@ public:
 	void cleanUp();
 
 protected:
+	bool noTex;
+
 	std::vector<dMesh> meshes;
 	std::string directory;
 
@@ -39,7 +41,7 @@ protected:
 	void processNode(aiNode* node, const aiScene* scene);
 	dMesh processMesh(aiMesh* mesh, const aiScene* scene);
 
-	std::vector<dTexture> loadTextures(aiMaterial* material, aiTextureType type);
+	std::vector<dTexture> loadMaterialTextures(aiMaterial* material, aiTextureType type);
 };
 
 #endif

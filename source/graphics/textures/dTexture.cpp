@@ -6,7 +6,7 @@ dTexture::dTexture()
 	: directory(""), path(""){}
 	
 dTexture::dTexture(std::string directory, std::string path, aiTextureType type)
-	: directory(directory), path(path), type(type){
+	: directory(directory), path(path), type(type) {
 
 	generate();	
 }
@@ -17,7 +17,7 @@ void dTexture::generate() {
 	//glBindTexture(GL_TEXTURE_2D, id??);
 }
 
-void dTexture::load(bool flip) {
+void dTexture::load() {
 
 	int width, height, nChannels;
 
@@ -50,12 +50,13 @@ void dTexture::load(bool flip) {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
 	}
 	else {
 
-		std::cout << "Failed to load image at" << path << std::endl;
+		std::cout << "Failed to load image at " << path << std::endl;
 	}
 
 	stbi_image_free(data);

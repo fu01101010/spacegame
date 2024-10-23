@@ -1,7 +1,7 @@
 #include "dModel.h"
 
-dModel::dModel(glm::vec3 position, glm::vec3 size)
-	: position(position), size(size) { }
+dModel::dModel(glm::vec3 position, glm::vec3 size, bool noTex)
+	: position(position), size(size), noTex(noTex) { }
 
 void dModel::init() {}
 
@@ -31,12 +31,12 @@ void dModel::cleanUp() {
 
 void dModel::loadModel(std::string path) {
 
-	Assimp::Importer Importer;
-	const aiScene* scene = Importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+	Assimp::Importer importer;
+	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
 
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
 
-		std::cout << "Could not load model at " << path << std::endl << Importer.GetErrorString() << std::endl;
+		std::cout << "Could not load model at " << path << std::endl << importer.GetErrorString() << std::endl;
 		return;
 	}
 
@@ -72,17 +72,17 @@ dMesh dModel::processMesh(aiMesh* mesh, const aiScene* scene) {
 	//vertices
 	for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
 
-		dVertex Vertex;
+		dVertex vertex;
 
 		//position
-		Vertex.position = glm::vec3(
+		vertex.position = glm::vec3(
 			mesh->mVertices[i].x,
 			mesh->mVertices[i].y,
 			mesh->mVertices[i].z
 		);
 
 		//normals
-		Vertex.normal = glm::vec3(
+		vertex.normal = glm::vec3(
 			mesh->mNormals[i].x,
 			mesh->mNormals[i].y,
 			mesh->mNormals[i].z
@@ -91,17 +91,17 @@ dMesh dModel::processMesh(aiMesh* mesh, const aiScene* scene) {
 		//textures
 		if (mesh->mTextureCoords[0]) {
 
-			Vertex.texCoord = glm::vec2(
+			vertex.texCoord = glm::vec2(
 				mesh->mTextureCoords[0][i].x,
 				mesh->mTextureCoords[0][i].y
 			);
 		}
 		else {
 
-			Vertex.texCoord = glm::vec2(0.0f);
+			vertex.texCoord = glm::vec2(0.0f);
 		}
 
-		vertices.push_back(Vertex);
+		vertices.push_back(vertex);
 	}
 
 	//Process indices
@@ -119,19 +119,31 @@ dMesh dModel::processMesh(aiMesh* mesh, const aiScene* scene) {
 
 		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
+		if (noTex) {
+
+			aiColor4D diffMaps(1.0f);
+			aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &diffMaps);
+
+			aiColor4D specMaps(1.0f);
+			aiGetMaterialColor(material, AI_MATKEY_COLOR_SPECULAR, &specMaps);
+
+			return dMesh(vertices, indices, diffMaps, specMaps);
+		}
+
+
 		//diffMaps
-		std::vector<dTexture> diffMaps = loadTextures(material, aiTextureType_DIFFUSE);
+		std::vector<dTexture> diffMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE);
 		textures.insert(textures.end(), diffMaps.begin(), diffMaps.end());
 
 		//specMaps
-		std::vector<dTexture> specMaps = loadTextures(material, aiTextureType_SPECULAR);
+		std::vector<dTexture> specMaps = loadMaterialTextures(material, aiTextureType_SPECULAR);
 		textures.insert(textures.end(), specMaps.begin(), specMaps.end());
 	}
 
 	return dMesh(vertices, indices, textures);
 }
 
-std::vector<dTexture> dModel::loadTextures(aiMaterial* material, aiTextureType type) {
+std::vector<dTexture> dModel::loadMaterialTextures(aiMaterial* material, aiTextureType type) {
 
 	std::vector<dTexture> textures;
 
@@ -158,10 +170,12 @@ std::vector<dTexture> dModel::loadTextures(aiMaterial* material, aiTextureType t
 
 		if (!helperSkipFlag) {
 
+			std::cout << directory << "///" << helperString.C_Str() << std::endl;
+
 			//not loaded yet
 			dTexture tex(directory, helperString.C_Str(), type);
-			tex.load(false);
-
+			
+			tex.load();
 			textures.push_back(tex);
 			texturesLoaded.push_back(tex);
 		}

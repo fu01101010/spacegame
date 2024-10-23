@@ -121,6 +121,11 @@ void shader::set4flt(const std::string &name, glm::vec4 value) {
 	glUniform4f(glGetUniformLocation(shaderID, name.c_str()), value.x, value.y, value.z, value.w);
 }
 
+void shader::set4flt(const std::string& name, aiColor4D color) {
+	glUniform4f(glGetUniformLocation(shaderID, name.c_str()), color.r, color.g, color.b, color.a);
+}
+
+
 void shader::setmat3(const std::string& name, glm::mat3 value) {
 
 	glUniformMatrix3fv(glGetUniformLocation(shaderID, name.c_str()), 1, GL_FALSE, glm::value_ptr(value));

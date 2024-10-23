@@ -41,7 +41,7 @@ std::vector<dVertex> dVertex::genDList(float* vertices, int nVertices) {
 dMesh::dMesh() {}
 
 dMesh::dMesh(std::vector<dVertex> vertices, std::vector<unsigned int> indices, std::vector<dTexture> textures)
-	: vertices(vertices), indices(indices), textures(textures) {
+	: vertices(vertices), indices(indices), textures(textures), noTex(false) {
 
 	setUp();
 }
@@ -56,8 +56,8 @@ void dMesh::render(shader Shader) {
 
 	if (noTex) {
 
-		//Shader.set4flt("Material.diffuse", diff);
-		//Shader.set4flt("Material.specular", spec);
+		Shader.set4flt("Material.diffuse", diff);
+		Shader.set4flt("Material.specular", spec);
 		Shader.set_int("noTex", 1);
 	}
 	else {

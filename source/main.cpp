@@ -21,6 +21,7 @@
 #include "../source/graphics/models/vModel_notex.h"
 #include "../source/graphics/models/dModel.h"
 #include "../source/graphics/light.h"
+#include "../source/graphics/dLight.h"
 
 #include "../source/graphics/models/vCube.hpp"
 #include "../source/graphics/models/vCube_notex.hpp"
@@ -44,7 +45,7 @@ double scrollDX, scrollDY;
 double deltaTime = 0.0f; // time inbetween frames
 double lastFrame = 0.0f; // time of last frame
 
-//vCube VCube = vCube(material::emerald, glm::vec3(0.0f), glm::vec3(1.4f));
+//vCube VCube = vCube(material::white_plastic, glm::vec3(0.0f), glm::vec3(1.4f));
 
 int main()
 {
@@ -82,25 +83,28 @@ int main()
 	Screen.setParameters();
 
 	// shaders
-	shader Shader("/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/dCore.vs", "/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/dCore.fs");
+	shader vShader("/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/dCore.vs", "/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/dCore.fs");
 	shader lightSourceShader("/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/vCore.vs", "/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/lightsource.fs");
 
-	dModel trollModel(glm::vec3(0.0f, 0.0f, -6.0f), glm::vec3(0.05f));
+	dModel trollModel(glm::vec3(0.0f, 0.0f, -6.0f), glm::vec3(0.05f), true);
 	trollModel.loadModel("/Users/ulysses/Desktop/source/projects/game/source/assets/models/lotr_troll/scene.gltf");
 
 	// lights
 	directLight DirectLight = { glm::vec3(-0.2f, -1.0f, -0.3f), glm::vec4(0.1f, 0.1f, 0.1f, 1.0f), glm::vec4(0.4f, 0.4f, 0.4f, 1.0f), glm::vec4(0.5f, 0.5f, 0.5f, 1.0f) };
 
-	spotLight SpotLight = {
+	dSpotLight SpotLight = {
 		camera::defaultCamera.cameraPosition, camera::defaultCamera.cameraFront,
 		glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(20.0f)),
 		1.0f, 0.07f, 0.032f,
 		glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), glm::vec4(1.0f), glm::vec4(1.0f)
 	};
 	
-	shader vShader("/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/vCore.vs", "/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/vCore.fs");
+	shader Shader("/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/vCore.vs", "/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/vCore.fs");
 	
 	//VCube.init();
+
+	vLightSource lamp = vLightSource(glm::vec3(1.0f), glm::vec3(0.05f), glm::vec3(0.8f), glm::vec3(1.0f), 1.0f, 0.09f, 0.032f, glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.25f));
+	lamp.init();
 
 	// render loop
 	while (!Screen.shouldClose()) {
@@ -116,15 +120,17 @@ int main()
 		// render
 		Screen.update();
 		
-		Shader.activate();
+		vShader.activate();
 
-		Shader.set3flt("viewPos", camera::defaultCamera.cameraPosition);
+		vShader.set3flt("viewPos", camera::defaultCamera.cameraPosition);
 
-		DirectLight.render(Shader);
+		//DirectLight.render(vShader);
+		vShader.set_int("noPointLights", 1);
+		lamp.PointLight.render(vShader, 0);
 
 		SpotLight.position = camera::defaultCamera.cameraPosition;
 		SpotLight.direction = camera::defaultCamera.cameraFront;
-		SpotLight.render(vShader);		
+		//SpotLight.render(vShader);		
 
 		glm::mat4 view = glm::mat4(1.0f);
 		glm::mat4 projection = glm::mat4(1.0f);
@@ -134,15 +140,17 @@ int main()
 			(float)screen::SCR_WIDTH / (float)screen::SCR_HEIGHT, 0.1f, 100.0f
 		);
 
-		Shader.setmat4("view", view);
-		Shader.setmat4("projection", projection);
+		vShader.setmat4("view", view);
+		vShader.setmat4("projection", projection);
 
-		trollModel.render(Shader);
+		trollModel.render(vShader);
 		//VCube.render(vShader);
 
 		lightSourceShader.activate();
 		lightSourceShader.setmat4("view", view);
 		lightSourceShader.setmat4("projection", projection);
+	
+		lamp.render(lightSourceShader);
 
 		// send new frame to window
 		Screen.newFrame();
@@ -150,6 +158,7 @@ int main()
 	}
 	
 	trollModel.cleanUp();
+	//lamp.cleanUp();
 	//VCube.cleanUp();
 
 	// glfw: terminate, clearing all previously allocated GLFW resources.

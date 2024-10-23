@@ -12,6 +12,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <assimp/scene.h>
+
 class shader {
 
 public:
@@ -37,6 +39,8 @@ public:
 	void set3flt(const std::string& name, glm::vec3 value);
 	void set4flt(const std::string& name, float value1, float value2, float value3, float value4);
 	void set4flt(const std::string& name, glm::vec4 value);
+	void set4flt(const std::string& name, aiColor4D color);
+
 	void setmat3(const std::string& name, glm::mat3 value);
 	void setmat4(const std::string& name, glm::mat4 value);
 };

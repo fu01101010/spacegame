@@ -18,7 +18,7 @@ public:
 	dTexture(std::string directory, std::string path, aiTextureType type);
 
 	void generate();
-	void load(bool flip = true);
+	void load();
 
 	void bind();
 

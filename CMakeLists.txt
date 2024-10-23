@@ -33,6 +33,7 @@ set ( ALL_LIBS
 add_executable(game 
 	"source/glad.c"
 	"source/graphics/light.cpp"
+	"source/graphics/dLight.cpp"
 	"source/graphics/material.cpp"
 	"source/graphics/shader.cpp"
 	"source/graphics/vMesh.cpp"
