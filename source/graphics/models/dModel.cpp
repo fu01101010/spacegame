@@ -11,6 +11,7 @@ void dModel::render(shader Shader) {
 
 	model = glm::translate(model, position);
 	model = glm::scale(model, size);
+	model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 
 	Shader.setmat4("model", model);
 	Shader.set_flt("Material.reflectivity", 0.5f);

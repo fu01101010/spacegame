@@ -1,0 +1,11 @@
+Model Information:
+* title:	McDonnell Douglas F-15 Strike Eagle
+* source:	https://sketchfab.com/3d-models/mcdonnell-douglas-f-15-strike-eagle-b7bf2e523aee40f9b048c9f7863fedc8
+* author:	andertan (https://sketchfab.com/andertan)
+
+Model License:
+* license type:	CC-BY-ND-4.0 (http://creativecommons.org/licenses/by-nd/4.0/)
+* requirements:	Author must be credited. Modified versions can not be distributed. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "McDonnell Douglas F-15 Strike Eagle" (https://sketchfab.com/3d-models/mcdonnell-douglas-f-15-strike-eagle-b7bf2e523aee40f9b048c9f7863fedc8) by andertan (https://sketchfab.com/andertan) licensed under CC-BY-ND-4.0 (http://creativecommons.org/licenses/by-nd/4.0/)
