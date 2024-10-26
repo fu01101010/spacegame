@@ -1,7 +1,50 @@
 #include "light.h"
 
-void pointLight::render(shader Shader, int IDx) {
+pointLight::pointLight(char type, glm::vec3 position, float k0, float k1, float k2, 
+		glm::vec3 ambient, 
+		glm::vec3 diffuse, 
+		glm::vec3 specular) 
+{}
 
+pointLight::pointLight(char type, glm::vec3 position, float k0, float k1, float k2, 
+		glm::vec4 ambient, 
+		glm::vec4 diffuse, 
+		glm::vec4 specular) 
+{}
+
+directLight::directLight(char type, glm::vec3 direction, 
+		glm::vec3 ambient, 
+		glm::vec3 diffuse, 
+		glm::vec3 specular) 
+{}
+
+directLight::directLight(char type, glm::vec3 direction, 
+		glm::vec4 ambient, 
+		glm::vec4 diffuse, 
+		glm::vec4 specular) 
+{}
+
+spotLight::spotLight(char type, glm::vec3 position, glm::vec3 direction, float innerRad, float outerRad, float k0, float k1, float k2, 
+		glm::vec3 ambient, 
+		glm::vec3 diffuse, 
+		glm::vec3 specular) 
+{}
+
+spotLight::spotLight(char type, glm::vec3 position, glm::vec3 direction, float innerRad, float outerRad, float k0, float k1, float k2, 
+		glm::vec3 ambient, 
+		glm::vec3 diffuse, 
+		glm::vec3 specular) 
+{}
+
+void pointLight::render(shader Shader, int idx) {
+	
+	switch (type) {
+		
+		case ('m'): {
+			
+			
+		}
+	}
 	std::string name = "PointLights[" + std::to_string(IDx) + "]";
 
 	Shader.set3flt(name + ".position", position);
