@@ -2,111 +2,65 @@
 #define LIGHT_H
 
 #include <glm/glm.hpp>
+#include <typeinfo>
 
 #include "shader.h"
 
-class pointLight {
+template< typename glm__vecN > class pointLight {
 
 public:
-	char type;
-
+	// basic constructor for now
+	pointLight(glm::vec3 position, glm::vec3 attC, glm__vecN ambient, glm__vecN diffuse, glm__vecN specular);
+	
 	glm::vec3 position;
 
-	//attenuation constants
-	float k0, k1, k2;
+	// attenuation constants
+	// k0 = attDat.x ... k2 = attDat.z
+	glm::vec3 attC;	
 
-	glm::vec4 ambient;
-	glm::vec4 diffuse;
-	glm::vec4 specular;
+	glm__vecN ambient;
+	glm__vecN diffuse;
+	glm__vecN specular;
 
-protected:
 	void render(shader Shader, int idx);
 };
 
-class directLight {
+template< typename glm__vecN > class directLight {
 	
 public:
-	char type;
+	// basic constructor for now
+	directLight(glm::vec3 direction, glm__vecN ambient, glm__vecN diffuse, glm__vecN specular);
 
 	glm::vec3 direction;
 
-	glm::vec4 ambient;
-	glm::vec4 diffuse;
-	glm::vec4 specular;
+	glm__vecN ambient;
+	glm__vecN diffuse;
+	glm__vecN specular;
 
-protected:
 	void render(shader Shader);
 };
 
-class spotLight {
+template< typename glm__vecN > class spotLight {
 	
 public:
-	char type;
-
-	glm::vec4 position;
-	glm::vec4 direction;
+	// basic constructor for now
+	spotLight(glm::vec3 position, glm::vec3 direction, float innR, float outR, glm::vec3 attC, glm__vecN ambient, glm__vecN diffuse, glm__vecN specular);
 	
-	float innerRad, outerRad;
+	glm::vec3 position;
+	glm::vec3 direction;
+	
+	// innerRadius, outerRadius
+	float innR, outR;
 
-	//attenuation constants
-	float k0, k1, k2;
+	// attenuation constants
+	// k0 = attDat.x ... k2 = attDat.z
+	glm::vec3 attC;
 
-	glm::vec4 ambient;
-	glm::vec4 diffuse;
-	glm::vec4 specular;
+	glm__vecN ambient;
+	glm__vecN diffuse;
+	glm__vecN specular;
 
-protected:
 	void render(shader Shader, int idx);
 };
-
-/*
-struct pointLight {
-
-	glm::vec3 position;
-
-	//attenuation constants
-	float k0;
-	float k1;
-	float k2;
-
-	glm::vec3 ambient;
-	glm::vec3 diffuse;
-	glm::vec3 specular;
-
-	void render(shader Shader, int IDx);
-};
-
-struct directLight {
-
-	glm::vec3 direction;
-
-	glm::vec3 ambient;
-	glm::vec3 diffuse;
-	glm::vec3 specular;
-
-	void render(shader Shader);
-};
-
-struct spotLight {
-
-	glm::vec3 position;
-	glm::vec3 direction;
-
-	float cutOff;
-	float outerCutOff;
-
-	//attenuation constants
-	float k0;
-	float k1;
-	float k2;
-
-	glm::vec3 ambient;
-	glm::vec3 diffuse;
-	glm::vec3 specular;
-
-	void render(shader Shader);
-};
-*/
-
 
 #endif

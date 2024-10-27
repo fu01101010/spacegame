@@ -1,6 +1,6 @@
 #version 330 core
 
-vec3 calculatePointLight(int IDx, vec3 normal, vec3 viewDir, vec3 tex);
+vec3 calculatePointLight(int idx, vec3 normal, vec3 viewDir, vec3 tex);
 vec3 calculateDirectLight(vec3 normal, vec3 viewDir, vec3 tex);
 vec3 calculateSpotLight(vec3 normal, vec3 viewDir, vec3 tex);
 
