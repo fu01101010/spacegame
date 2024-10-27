@@ -2,65 +2,111 @@
 #define LIGHT_H
 
 #include <glm/glm.hpp>
-#include <typeinfo>
 
 #include "shader.h"
 
-template< typename glm__vecN > class pointLight {
+class pointLight {
 
 public:
-	// basic constructor for now
-	pointLight(glm::vec3 position, glm::vec3 attC, glm__vecN ambient, glm__vecN diffuse, glm__vecN specular);
-	
+	char type;
+
 	glm::vec3 position;
 
-	// attenuation constants
-	// k0 = attDat.x ... k2 = attDat.z
-	glm::vec3 attC;	
+	//attenuation constants
+	float k0, k1, k2;
 
-	glm__vecN ambient;
-	glm__vecN diffuse;
-	glm__vecN specular;
+	glm::vec4 ambient;
+	glm::vec4 diffuse;
+	glm::vec4 specular;
 
+protected:
 	void render(shader Shader, int idx);
 };
 
-template< typename glm__vecN > class directLight {
+class directLight {
 	
 public:
-	// basic constructor for now
-	directLight(glm::vec3 direction, glm__vecN ambient, glm__vecN diffuse, glm__vecN specular);
+	char type;
 
 	glm::vec3 direction;
 
-	glm__vecN ambient;
-	glm__vecN diffuse;
-	glm__vecN specular;
+	glm::vec4 ambient;
+	glm::vec4 diffuse;
+	glm::vec4 specular;
+
+protected:
+	void render(shader Shader);
+};
+
+class spotLight {
+	
+public:
+	char type;
+
+	glm::vec4 position;
+	glm::vec4 direction;
+	
+	float innerRad, outerRad;
+
+	//attenuation constants
+	float k0, k1, k2;
+
+	glm::vec4 ambient;
+	glm::vec4 diffuse;
+	glm::vec4 specular;
+
+protected:
+	void render(shader Shader, int idx);
+};
+
+/*
+struct pointLight {
+
+	glm::vec3 position;
+
+	//attenuation constants
+	float k0;
+	float k1;
+	float k2;
+
+	glm::vec3 ambient;
+	glm::vec3 diffuse;
+	glm::vec3 specular;
+
+	void render(shader Shader, int IDx);
+};
+
+struct directLight {
+
+	glm::vec3 direction;
+
+	glm::vec3 ambient;
+	glm::vec3 diffuse;
+	glm::vec3 specular;
 
 	void render(shader Shader);
 };
 
-template< typename glm__vecN > class spotLight {
-	
-public:
-	// basic constructor for now
-	spotLight(glm::vec3 position, glm::vec3 direction, float innR, float outR, glm::vec3 attC, glm__vecN ambient, glm__vecN diffuse, glm__vecN specular);
-	
+struct spotLight {
+
 	glm::vec3 position;
 	glm::vec3 direction;
-	
-	// innerRadius, outerRadius
-	float innR, outR;
 
-	// attenuation constants
-	// k0 = attDat.x ... k2 = attDat.z
-	glm::vec3 attC;
+	float cutOff;
+	float outerCutOff;
 
-	glm__vecN ambient;
-	glm__vecN diffuse;
-	glm__vecN specular;
+	//attenuation constants
+	float k0;
+	float k1;
+	float k2;
 
-	void render(shader Shader, int idx);
+	glm::vec3 ambient;
+	glm::vec3 diffuse;
+	glm::vec3 specular;
+
+	void render(shader Shader);
 };
+*/
+
 
 #endif

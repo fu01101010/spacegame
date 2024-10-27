@@ -45,7 +45,7 @@ add_executable(game
 	"source/graphics/models/vCube.hpp"
 	"source/graphics/models/vCube_notex.hpp"
 	"source/graphics/models/dCube.hpp"
-	# "source/graphics/models/vLightsource.hpp"
+	"source/graphics/models/vLightsource.hpp"
 	"source/graphics/textures/dTexture.cpp"
 	"source/graphics/textures/vTexture.cpp"
 	"source/io/camera.cpp"
