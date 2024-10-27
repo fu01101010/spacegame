@@ -5,23 +5,37 @@
 
 #include "shader.h"
 
-struct pointLight {
+struct uPointLight {
 
 	glm::vec3 position;
 
 	//attenuation constants
-	float k0;
-	float k1;
-	float k2;
+	//k0 <- attC.x ... k2 <- attC.z
+	glm::vec3 attC;
 
 	glm::vec3 ambient;
 	glm::vec3 diffuse;
 	glm::vec3 specular;
 
-	void render(shader Shader, int IDx);
+	void render(shader Shader, int idx);
 };
 
-struct directLight {
+struct mPointLight {
+
+	glm::vec3 position;
+
+	//attenuation constants
+	//k0 <- attC.x ... k2 <- attC.z
+	glm::vec3 attC;
+
+	glm::vec4 ambient;
+	glm::vec4 diffuse;
+	glm::vec4 specular;
+
+	void render(shader Shader, int idx);
+};
+
+struct uDirectLight {
 
 	glm::vec3 direction;
 
@@ -32,24 +46,55 @@ struct directLight {
 	void render(shader Shader);
 };
 
-struct spotLight {
+struct mDirectLight {
+
+	glm::vec3 direction;
+
+	glm::vec4 ambient;
+	glm::vec4 diffuse;
+	glm::vec4 specular;
+
+	void render(shader Shader);
+};
+
+struct uSpotLight {
 
 	glm::vec3 position;
 	glm::vec3 direction;
 
-	float cutOff;
-	float outerCutOff;
+	// innR <- inner cut off angle
+	// outR <- outer cut off angle
+	float innR, outR;
 
 	//attenuation constants
-	float k0;
-	float k1;
-	float k2;
+	//k0 <- attC.x ... k2 <- attC.z
+	glm::vec3 attC;
 
-	glm::vec3 ambient;
-	glm::vec3 diffuse;
-	glm::vec3 specular;
+	glm::vec4 ambient;
+	glm::vec4 diffuse;
+	glm::vec4 specular;
 
-	void render(shader Shader);
+	void render(shader Shader, int idx);
+};
+
+struct mSpotLight {
+
+	glm::vec3 position;
+	glm::vec3 direction;
+
+	// innR <- inner cut off angle
+	// outR <- outer cut off angle
+	float innR, outR;
+
+	//attenuation constants
+	//k0 <- attC.x ... k2 <- attC.z
+	glm::vec3 attC;
+
+	glm::vec4 ambient;
+	glm::vec4 diffuse;
+	glm::vec4 specular;
+
+	void render(shader Shader, int idx);
 };
 
 #endif

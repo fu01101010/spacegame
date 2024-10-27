@@ -1,59 +1,54 @@
 #version 330 core
 
-vec3 calculatePointLight(int IDx, vec3 normal, vec3 viewDir, vec3 tex);
+//
+//
+// foos
+
+vec3 calculatePointLight(int idx, vec3 normal, vec3 viewDir, vec3 tex);
 vec3 calculateDirectLight(vec3 normal, vec3 viewDir, vec3 tex);
-vec3 calculateSpotLight(vec3 normal, vec3 viewDir, vec3 tex);
+vec3 calculateSpotLight(int idx, vec3 normal, vec3 viewDir, vec3 tex);
 
-struct material {
 
-	sampler2D diffuse;
-	sampler2D specular;
-	float reflectivity;
-};
+
+//
+//
+// materials
+
+struct material { sampler2D diffuse; sampler2D specular; float reflectivity; };
+
+
+
+//
+//
+// lights
+
+// pointLights
+
+struct pointLight { vec3 position; vec3 attC; vec3 ambient; vec3 diffuse; vec3 specular; };
 
 #define maxPointLights 10
-struct pointLight {
 
-	vec3 position;
-
-	float k0;
-	float k1;
-	float k2;
-
-	vec3 ambient;
-	vec3 diffuse;
-	vec3 specular;
-};
 uniform pointLight PointLights[maxPointLights];
 uniform int nPointLights;
 
-struct directLight {
 
-	vec3 direction;
+// directLights
 
-	vec3 ambient;
-	vec3 diffuse;
-	vec3 specular;
-};
+struct directLight { vec3 direction; vec3 ambient; vec3 diffuse; vec3 specular; };
 uniform directLight DirectLight;
 
-struct spotLight {
 
-	vec3 position;
-	vec3 direction;
+// spotLights
 
-	float k0;
-	float k1;
-	float k2;
+struct spotLight { vec3 position; vec3 direction; vec3 attC; float innR; float outR; vec3 ambient; vec3 diffuse; vec3 specular; };
 
-	float cutOff;
-	float outerCutOff;
+#define maxSpotLights 10
 
-	vec3 ambient;
-	vec3 diffuse;
-	vec3 specular;
-};
-uniform spotLight SpotLight;
+uniform spotLight SpotLights[maxSpotLights];
+uniform int nSpotLights;
+
+
+// other vars
 
 out vec4 fragmentColor;
 
@@ -75,17 +70,23 @@ void main() {
 
 	vec3 retval;
 
-	//DirectLight
+	// DirectLight
+
 	retval = calculateDirectLight(normal, viewDir, texture);
 
-	//PointLight
+	//PointLights
+
 	for (int i = 0; i < nPointLights; ++i) {
 
 		retval += calculatePointLight(i, normal, viewDir, texture);
 	}
 
-	//SpotLight	
-	retval += calculateSpotLight(normal, viewDir, texture);
+	//SpotLights
+
+	for (int i = 0; i < nSpotLights; ++i) {
+
+		retval += calculateSpotLight(i, normal, viewDir, texture);
+	}
 
 	fragmentColor = vec4(retval, 1.0); 
 }
@@ -109,7 +110,7 @@ vec3 calculatePointLight(int IDx, vec3 normal, vec3 viewDir, vec3 tex)  {
 
 	float specComponent = pow(max(dot(viewDir, reflectDir), 0.0), Material.reflectivity * 128);
 
-	vec3 specular = PointLights[IDx].specular * (specComponent * vec3(texture(Material.specular, vsOutTexCoord))); //if specular -> vec3
+	vec3 specular = PointLights[IDx].specular * (specComponent * vec3(texture(Material.specular, vsOutTexCoord)));
 
 
 	//attenuation
@@ -144,32 +145,32 @@ vec3 calculateDirectLight(vec3 normal, vec3 viewDir, vec3 tex) {
 	return vec3(ambient + diffuse + specular);
 }
 
-vec3 calculateSpotLight(vec3 normal, vec3 viewDir, vec3 tex) {
+vec3 calculateSpotLight(int idx, vec3 normal, vec3 viewDir, vec3 tex) {
 
 	//ambient SpotLight
-	vec3 ambient = SpotLight.ambient * tex;
+	vec3 ambient = SpotLights[idx].ambient * tex;
 
-	vec3 spotLightDir = normalize(SpotLight.position - vsOutFragPos);
+	vec3 spotLightDir = normalize(SpotLights[idx].position - vsOutFragPos);
 
-	float theta0 = dot(spotLightDir, normalize(-SpotLight.direction));
+	float theta0 = dot(spotLightDir, normalize(-SpotLights[idx].direction));
 
-	if (theta0 > SpotLight.outerCutOff) {
-		//if in cutOff -> RENDER
+	if (theta0 > SpotLights[idx].outR) {
+		//if in cutOff -> light it
 
 		//diffused SpotLight
 		float diffComponent = max(dot(normal, spotLightDir), 0.0);
-		vec3 diffuse = SpotLight.diffuse * (diffComponent * vec3(texture(Material.diffuse, vsOutTexCoord)));
+		vec3 diffuse = SpotLights[idx].diffuse * (diffComponent * vec3(texture(Material.diffuse, vsOutTexCoord)));
 
 
 		//specular SpotLight
 		vec3 reflectDir = reflect(-spotLightDir, normal);
 
 		float specComponent = pow(max(dot(viewDir, reflectDir), 0.0), Material.reflectivity * 128);
-		vec3 specular = SpotLight.specular * (specComponent * vec3(texture(Material.specular, vsOutTexCoord)));
+		vec3 specular = SpotLights[idx].specular * (specComponent * vec3(texture(Material.specular, vsOutTexCoord)));
 
 
 		//intensity
-		float intensity = (theta0 - SpotLight.outerCutOff) / (SpotLight.cutOff - SpotLight.outerCutOff);
+		float intensity = (theta0 - SpotLights[idx].outR) / (SpotLights[idx].innR - SpotLights[idx].outR);
 		intensity = clamp(intensity, 0.0, 1.0);
 
 		diffuse *= intensity;
@@ -177,8 +178,8 @@ vec3 calculateSpotLight(vec3 normal, vec3 viewDir, vec3 tex) {
 
 
 		//attenuation
-		float distance = length(SpotLight.position - vsOutFragPos);
-		float attenuation = 1.0 / (SpotLight.k0 + SpotLight.k1 * distance + SpotLight.k2 * (distance * distance));
+		float distance = length(SpotLights[idx].position - vsOutFragPos);
+		float attenuation = 1.0 / (SpotLights[idx].attC.x + SpotLights[idx].attC.y * distance + SpotLights[idx].attC.z * (distance * distance));
 
 		diffuse *= attenuation;
 		specular *= attenuation;

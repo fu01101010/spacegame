@@ -86,22 +86,16 @@ int main()
 	shader vShader("/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/dCore.vs", "/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/dCore.fs");
 	shader lightSourceShader("/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/vCore.vs", "/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/lightsource.fs");
 
-	//dModel trollModel(glm::vec3(0.0f, 0.0f, -6.0f), glm::vec3(0.05f), false);
-	//dModel eagle(glm::vec3(0.0f, 0.0f, -6.0f), glm::vec3(0.2f), false);
-	dModel m4a1(glm::vec3(0.0f, 0.0f, -6.0f), glm::vec3(0.01f), true);
-	//dModel superHorny(glm::vec3(0.0f, 0.0f, -6.0f), glm::vec3(0.05f), false);
-	//trollModel.loadModel("/Users/ulysses/Desktop/source/projects/game/source/assets/models/lotr_troll/scene.gltf");
-	//eagle.loadModel("/Users/ulysses/Desktop/source/projects/game/source/assets/models/eagle/scene.gltf");
-	m4a1.loadModel("/Users/ulysses/Desktop/source/projects/game/source/assets/models/m4a1/scene.gltf");
-	//superHorny.loadModel("/Users/ulysses/Desktop/source/projects/game/source/assets/models/super_horny/scene.gltf");
+	dModel trollModel(glm::vec3(0.0f, 0.0f, -6.0f), glm::vec3(0.05f), false);
+	trollModel.loadModel("/Users/ulysses/Desktop/source/projects/game/source/assets/models/lotr_troll/scene.gltf");
 
 	// lights
-	directLight DirectLight = { glm::vec3(-0.2f, -1.0f, -0.3f), glm::vec4(0.1f, 0.1f, 0.1f, 1.0f), glm::vec4(0.4f, 0.4f, 0.4f, 1.0f), glm::vec4(0.5f, 0.5f, 0.5f, 1.0f) };
+	mDirectLight DirectLight = { glm::vec3(-0.2f, -1.0f, -0.3f), glm::vec4(0.1f, 0.1f, 0.1f, 1.0f), glm::vec4(0.4f, 0.4f, 0.4f, 1.0f), glm::vec4(0.5f, 0.5f, 0.5f, 1.0f) };
 
-	dSpotLight SpotLight = {
+	mSpotLight SpotLight = {
 		camera::defaultCamera.cameraPosition, camera::defaultCamera.cameraFront,
 		glm::cos(glm::radians(20.5f)), glm::cos(glm::radians(25.5f)),
-		1.0f, 0.0f, 0.0f,
+		glm::vec3(1.0f, 0.07f, 0.032f),
 		glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), glm::vec4(1.0f), glm::vec4(1.0f)
 	};
 	// 	1.0f, 0.07f, 0.032f,
@@ -110,8 +104,8 @@ int main()
 	
 	//VCube.init();
 
-	//vLightSource lamp = vLightSource(glm::vec3(1.0f), glm::vec3(0.05f), glm::vec3(0.8f), glm::vec3(1.0f), 1.0f, 0.09f, 0.032f, glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.25f));
-	//lamp.init();
+	vLightSource lamp = vLightSource(glm::vec3(1.0f), glm::vec3(0.05f), glm::vec3(0.8f), glm::vec3(1.0f), glm::vec3(1.0f, 0.07f, 0.032f), glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.25f));
+	lamp.init();
 
 	// render loop
 	while (!Screen.shouldClose()) {
@@ -132,12 +126,13 @@ int main()
 		vShader.set3flt("viewPos", camera::defaultCamera.cameraPosition);
 
 		DirectLight.render(vShader);
-		//vShader.set_int("nPointLights", 1);
-		//lamp.PointLight.render(vShader, 0);
+		vShader.set_int("nPointLights", 1);
+		lamp.PointLight.render(vShader, 0);
 
 		SpotLight.position = camera::defaultCamera.cameraPosition;
 		SpotLight.direction = camera::defaultCamera.cameraFront;
-		SpotLight.render(vShader);		
+		vShader.set_int("nSpotLights", 1);
+		SpotLight.render(vShader, 0);
 
 		glm::mat4 view = glm::mat4(1.0f);
 		glm::mat4 projection = glm::mat4(1.0f);
@@ -150,28 +145,22 @@ int main()
 		vShader.setmat4("view", view);
 		vShader.setmat4("projection", projection);
 
-		//trollModel.render(vShader);
-		//eagle.render(vShader);
-		m4a1.render(vShader);
-		//superHorny.render(vShader);
+		trollModel.render(vShader);
 		//VCube.render(vShader);
 
 		lightSourceShader.activate();
 		lightSourceShader.setmat4("view", view);
 		lightSourceShader.setmat4("projection", projection);
 	
-		//lamp.render(lightSourceShader);
+		lamp.render(lightSourceShader);
 
 		// send new frame to window
 		Screen.newFrame();
 		glfwPollEvents();
 	}
 	
-	//superHorny.cleanUp();
-	m4a1.cleanUp();
-	//eagle.cleanUp();
-	//trollModel.cleanUp();
-	//lamp.cleanUp();
+	trollModel.cleanUp();
+	lamp.cleanUp();
 	//VCube.cleanUp();
 
 	// glfw: terminate, clearing all previously allocated GLFW resources.

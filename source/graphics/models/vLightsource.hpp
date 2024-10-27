@@ -11,7 +11,7 @@ public:
 	glm::vec3 lightColor;
 
 	//Light strength
-	pointLight PointLight;
+	uPointLight PointLight;
 
 	vLightSource() {}
 	vLightSource(
@@ -19,13 +19,11 @@ public:
 		glm::vec3 ambient = glm::vec3(1.0f), 
 		glm::vec3 diffuse = glm::vec3(1.0f), 
 		glm::vec3 specular = glm::vec3(1.0f), 
-		float k0 = 1.0f, 
-		float k1 = 0.09f, 
-		float k2 = 0.032f,
+		glm::vec3 attC = glm::vec3(1.0f, 0.07f, 0.032f),
 		glm::vec3 position = glm::vec3(0.0f), 
 		glm::vec3 size = glm::vec3(1.0f))
 		:	lightColor(lightColor), 
-			PointLight({position, k0, k1, k2, ambient, diffuse, specular}),
+			PointLight({position, attC, ambient, diffuse, specular}),
 			vCube(material::white_plastic, position, size) {}
 
 	void render(shader Shader) {
