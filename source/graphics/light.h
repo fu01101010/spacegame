@@ -5,7 +5,66 @@
 
 #include "shader.h"
 
+<<<<<<< HEAD
 struct uPointLight {
+=======
+class pointLight {
+
+public:
+	char type;
+
+	glm::vec3 position;
+
+	//attenuation constants
+	float k0, k1, k2;
+
+	glm::vec4 ambient;
+	glm::vec4 diffuse;
+	glm::vec4 specular;
+
+protected:
+	void render(shader Shader, int idx);
+};
+
+class directLight {
+	
+public:
+	char type;
+
+	glm::vec3 direction;
+
+	glm::vec4 ambient;
+	glm::vec4 diffuse;
+	glm::vec4 specular;
+
+protected:
+	void render(shader Shader);
+};
+
+class spotLight {
+	
+public:
+	char type;
+
+	glm::vec4 position;
+	glm::vec4 direction;
+	
+	float innerRad, outerRad;
+
+	//attenuation constants
+	float k0, k1, k2;
+
+	glm::vec4 ambient;
+	glm::vec4 diffuse;
+	glm::vec4 specular;
+
+protected:
+	void render(shader Shader, int idx);
+};
+
+/*
+struct pointLight {
+>>>>>>> 528a8ee5ae6310d1daa5483bac7eb887feeaa601
 
 	glm::vec3 position;
 
@@ -96,5 +155,7 @@ struct mSpotLight {
 
 	void render(shader Shader, int idx);
 };
+*/
+
 
 #endif

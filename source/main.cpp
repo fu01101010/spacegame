@@ -94,7 +94,11 @@ int main()
 	mSpotLight SpotLight = {
 		camera::defaultCamera.cameraPosition, camera::defaultCamera.cameraFront,
 		glm::cos(glm::radians(20.5f)), glm::cos(glm::radians(25.5f)),
+<<<<<<< HEAD
 		glm::vec3(1.0f, 0.07f, 0.032f),
+=======
+		1.0f, 0.07f, 0.032f,
+>>>>>>> 528a8ee5ae6310d1daa5483bac7eb887feeaa601
 		glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), glm::vec4(1.0f), glm::vec4(1.0f)
 	};
 	// 	1.0f, 0.07f, 0.032f,
