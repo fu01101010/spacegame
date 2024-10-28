@@ -1,6 +1,9 @@
 #ifndef VCUBE_HPP
 #define VCUBE_HPP
 
+#include <vector>
+#include <string>
+
 #include "vModel.h"
 #include "../material.h"
 
@@ -13,9 +16,17 @@ public:
 
 	material Material;
 
+	bool texFlag;
+
+	// <-- tex directories listed manually
+	std::vector<std::string> texDirsData = {};
+
 	vCube() {}
-	vCube(material Material, glm::vec3 position, glm::vec3 size) 
-		: Material(Material), position(position), size(size) {}
+	vCube(material Material, glm::vec3 position, glm::vec3 size, bool texFlag = false) 
+		: Material(Material), position(position), size(size), texFlag (texFlag) {}
+
+	vCube(material Material, glm::vec3 position, glm::vec3 size, bool texFlag, std::vector<vTexture>* texes)
+		: Material(Material), position(position), size(size), texFlag (texFlag),  {}
 
 	void init() {
 
@@ -23,12 +34,12 @@ public:
 
 		float vertices[] = {
 			//position		Normal			TexCoord
-			-0.5f, -0.5f, -0.5f,	0.0f,  0.0f, -1.0f,	0.0f, 0.0f,
-			 0.5f, -0.5f, -0.5f,	0.0f,  0.0f, -1.0f,	1.0f, 0.0f,
-			 0.5f,  0.5f, -0.5f,	0.0f,  0.0f, -1.0f,	1.0f, 1.0f,
-			 0.5f,  0.5f, -0.5f,	0.0f,  0.0f, -1.0f,	1.0f, 1.0f,
-			-0.5f,  0.5f, -0.5f,	0.0f,  0.0f, -1.0f,	0.0f, 1.0f,
-			-0.5f, -0.5f, -0.5f,	0.0f,  0.0f, -1.0f,	0.0f, 0.0f,
+			-0.5f, -0.5f, -0.5f,	 0.0f,  0.0f, -1.0f,	0.0f, 0.0f,
+			 0.5f, -0.5f, -0.5f,	 0.0f,  0.0f, -1.0f,	1.0f, 0.0f,
+			 0.5f,  0.5f, -0.5f,	 0.0f,  0.0f, -1.0f,	1.0f, 1.0f,
+			 0.5f,  0.5f, -0.5f,	 0.0f,  0.0f, -1.0f,	1.0f, 1.0f,
+			-0.5f,  0.5f, -0.5f,	 0.0f,  0.0f, -1.0f,	0.0f, 1.0f,
+			-0.5f, -0.5f, -0.5f,	 0.0f,  0.0f, -1.0f,	0.0f, 0.0f,
 
 			-0.5f, -0.5f,  0.5f,     0.0f,  0.0f,  1.0f,	0.0f, 0.0f,
 			 0.5f, -0.5f,  0.5f,     0.0f,  0.0f,  1.0f,	1.0f, 0.0f,

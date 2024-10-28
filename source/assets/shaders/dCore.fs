@@ -4,8 +4,6 @@
 //
 // foos
 
-// only textured items for now
-
 vec4 calculatePointLight(int idx, vec3 normal, vec3 viewDir, vec4 texDiff, vec4 texSpec);
 vec4 calculateDirectLight(vec3 normal, vec3 viewDir, vec4 texDiff, vec4 texSpec);
 vec4 calculateSpotLight(int idx, vec3 normal, vec3 viewDir, vec4 texDiff, vec4 texSpec);

@@ -21,7 +21,6 @@
 #include "../source/graphics/models/vModel_notex.h"
 #include "../source/graphics/models/dModel.h"
 #include "../source/graphics/light.h"
-#include "../source/graphics/dLight.h"
 
 #include "../source/graphics/models/vCube.hpp"
 #include "../source/graphics/models/vCube_notex.hpp"
