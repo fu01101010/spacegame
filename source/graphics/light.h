@@ -5,9 +5,6 @@
 
 #include "shader.h"
 
-<<<<<<< HEAD
-struct uPointLight {
-=======
 class pointLight {
 
 public:

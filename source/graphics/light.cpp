@@ -1,10 +1,5 @@
 #include "light.h"
 
-<<<<<<< HEAD
-void uPointLight::render(shader Shader, int idx) {
-
-	std::string name = "PointLights[" + std::to_string(idx) + "]";
-=======
 pointLight::pointLight(char type, glm::vec3 position, float k0, float k1, float k2, 
 		glm::vec3 ambient, 
 		glm::vec3 diffuse, 
@@ -41,17 +36,9 @@ spotLight::spotLight(char type, glm::vec3 position, glm::vec3 direction, float i
 		glm::vec3 specular) 
 {}
 
-void pointLight::render(shader Shader, int idx) {
+void PointLight::render(shader Shader, int idx) {
 	
-	switch (type) {
-		
-		case ('m'): {
-			
-			
-		}
-	}
-	std::string name = "PointLights[" + std::to_string(IDx) + "]";
->>>>>>> 528a8ee5ae6310d1daa5483bac7eb887feeaa601
+	std::string name = "uPointLights[" + std::to_string(IDx) + "]";
 
 	Shader.set3flt(name + ".position", position);
 
@@ -62,9 +49,9 @@ void pointLight::render(shader Shader, int idx) {
 	Shader.set3flt(name + ".specular", specular);
 }
 
-void mPointLight::render(shader Shader, int idx) {
+void PointLight::render(shader Shader, int idx) {
 
-	std::string name = "PointLights[" + std::to_string(idx) + "]";
+	std::string name = "mPointLights[" + std::to_string(idx) + "]";
 
 	Shader.set3flt(name + ".position", position);
 
@@ -75,9 +62,9 @@ void mPointLight::render(shader Shader, int idx) {
 	Shader.set4flt(name + ".specular", specular);
 }
 
-void uDirectLight::render(shader Shader) {
+void DirectLight::render(shader Shader) {
 
-	std::string name = "DirectLight";
+	std::string name = "uDirectLight";
 
 	Shader.set3flt(name + ".direction", direction);
 
@@ -86,9 +73,9 @@ void uDirectLight::render(shader Shader) {
 	Shader.set3flt(name + ".specular", specular);
 }
 
-void mDirectLight::render(shader Shader) {
+void DirectLight::render(shader Shader) {
 
-	std::string name = "DirectLight";
+	std::string name = "mDirectLight";
 
 	Shader.set3flt(name + ".direction", direction);
 
@@ -97,9 +84,9 @@ void mDirectLight::render(shader Shader) {
 	Shader.set4flt(name + ".specular", specular);
 }
 
-void uSpotLight::render(shader Shader, int idx) {
+void SpotLight::render(shader Shader, int idx) {
 
-	std::string name = "SpotLights[" + std::to_string(idx) + "]";
+	std::string name = "uSpotLights[" + std::to_string(idx) + "]";
 
 	Shader.set3flt(name + ".position", position);
 	Shader.set3flt(name + ".direction", direction);
@@ -114,9 +101,9 @@ void uSpotLight::render(shader Shader, int idx) {
 	Shader.set3flt(name + ".specular", specular);
 }
 
-void mSpotLight::render(shader Shader, int idx) {
+void SpotLight::render(shader Shader, int idx) {
 
-	std::string name = "SpotLights[" + std::to_string(idx) + "]";
+	std::string name = "mSpotLights[" + std::to_string(idx) + "]";
 
 	Shader.set3flt(name + ".position", position);
 	Shader.set3flt(name + ".direction", direction);
