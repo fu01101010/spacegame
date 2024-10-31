@@ -1,11 +1,43 @@
-#include "dModel.h"
+#include "model.h"
 
-dModel::dModel(glm::vec3 position, glm::vec3 size, bool noTex)
+
+
+//
+//
+// default vertex model
+
+u_model::u_model() {}
+
+void u_model::init() {}
+
+void u_model::render(shader Shader) {
+
+	for (mesh mesh : meshes) {
+
+		mesh.render(Shader);
+	}
+}
+
+void u_model::cleanUp() {
+
+	for (mesh mesh : meshes) {
+
+		mesh.cleanUp();
+	}
+}
+
+
+
+//
+//
+// .gltf model
+
+m_model::m_model(glm::vec3 position, glm::vec3 size, bool noTex)
 	: position(position), size(size), noTex(noTex) { }
 
-void dModel::init() {}
+void m_model::init() {}
 
-void dModel::render(shader Shader) {
+void m_model::render(shader Shader) {
 
 	glm::mat4 model = glm::mat4(1.0f);
 
@@ -16,21 +48,21 @@ void dModel::render(shader Shader) {
 	Shader.setmat4("model", model);
 	Shader.set_flt("Material.reflectivity", 0.5f);
 
-	for (dMesh mesh : meshes) {
+	for (mesh mesh : meshes) {
 
 		mesh.render(Shader);
 	}
 }
 
-void dModel::cleanUp() {
+void m_model::cleanUp() {
 
-	for (dMesh mesh : meshes) {
+	for (mesh mesh : meshes) {
 
 		mesh.cleanUp();
 	}
 }
 
-void dModel::loadModel(std::string path) {
+void m_model::loadModel(std::string path) {
 
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
@@ -46,7 +78,7 @@ void dModel::loadModel(std::string path) {
 	processNode(scene->mRootNode, scene);
 }
 
-void dModel::processNode(aiNode* node, const aiScene* scene) {
+void m_model::processNode(aiNode* node, const aiScene* scene) {
 
 	//process all meshes
 	for (unsigned int i = 0; i < node->mNumMeshes; ++i) {
@@ -63,17 +95,17 @@ void dModel::processNode(aiNode* node, const aiScene* scene) {
 	}
 }
 
-dMesh dModel::processMesh(aiMesh* mesh, const aiScene* scene) {
+mesh m_model::processMesh(aiMesh* mesh, const aiScene* scene) {
 
-	std::vector<dVertex> vertices;
+	std::vector<vertex> vertices;
 	std::vector<unsigned int> indices;
 
-	std::vector<dTexture> textures;
+	std::vector<m_texture> textures;
 
 	//vertices
 	for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
 
-		dVertex vertex;
+		vertex vertex;
 
 		//position
 		vertex.position = glm::vec3(
@@ -128,25 +160,25 @@ dMesh dModel::processMesh(aiMesh* mesh, const aiScene* scene) {
 			aiColor4D specMaps(1.0f);
 			aiGetMaterialColor(material, AI_MATKEY_COLOR_SPECULAR, &specMaps);
 
-			return dMesh(vertices, indices, diffMaps, specMaps);
+			return mesh(vertices, indices, diffMaps, specMaps);
 		}
 
 
 		//diffMaps
-		std::vector<dTexture> diffMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE);
+		std::vector<m_texture> diffMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE);
 		textures.insert(textures.end(), diffMaps.begin(), diffMaps.end());
 
 		//specMaps
-		std::vector<dTexture> specMaps = loadMaterialTextures(material, aiTextureType_SPECULAR);
+		std::vector<m_texture> specMaps = loadMaterialTextures(material, aiTextureType_SPECULAR);
 		textures.insert(textures.end(), specMaps.begin(), specMaps.end());
 	}
 
-	return dMesh(vertices, indices, textures);
+	return mesh(vertices, indices, textures);
 }
 
-std::vector<dTexture> dModel::loadMaterialTextures(aiMaterial* material, aiTextureType type) {
+std::vector<m_texture> m_model::loadMaterialTextures(aiMaterial* material, aiTextureType type) {
 
-	std::vector<dTexture> textures;
+	std::vector<m_texture> textures;
 
 	for (unsigned int i = 0; i < material->GetTextureCount(type); ++i) {
 
