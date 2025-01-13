@@ -31,26 +31,31 @@
 
 #include "../source/utility/terrain/terrain.h"
 
+// funcs here
 void processInput(double deltaTime);
 
+
+// io here
 screen Screen;
-camera camera::defaultCamera(glm::vec3(0.0f, 1.0f, 0.0f));
 
 double dx, dy;
 double scrollDX, scrollDY;
 
-bool wireframeFlag = false;
-
 double deltaTime = 0.0f; // time inbetween frames
 double lastFrame = 0.0f; // time of last frame
 
-ucube UCube = ucube(material::brass, glm::vec3(0.0f), glm::vec3(1.4f));
-vcube VCube = vcube(material::white_plastic, glm::vec3(0.0f), glm::vec3(1.4f));
+
+// temporary 
+camera camera::defaultCamera(glm::vec3(0.0f, 1.0f, 0.0f));
+
+bool wireframeFlag = false;
 
 terrain UTerrain = terrain(material::black_plastic, glm::vec3(0.0f), "/Users/ulysses/Desktop/source/projects/game/source/assets/heightMaps/image.jpg", 0.01f);
 
-int main()
-{
+
+
+// main
+int main() {
 
 	// glfw: initialize and configure
 
@@ -76,6 +81,7 @@ int main()
 
 	// glad: load all OpenGL function pointers
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+		
 		std::cout << "Failed to initialize GLAD" << std::endl;
 		return -1;
 	}
@@ -83,41 +89,20 @@ int main()
 	Screen.setParameters();
 
 	// shaders
-	shader uShader("/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/core/ucore.vs", "/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/core/ucore.fs");
-	shader vShader("/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/core/mcore.vs", "/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/core/mcore.fs");
-	shader lightSourceShader("/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/core/vcore.vs", "/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/lightsource.fs");
+	shader mShader("/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/core/ucore.vs", "/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/core/ucore.fs");
+	shader uShader("/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/core/mcore.vs", "/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/core/mcore.fs");
 
-	m_model trollModel(glm::vec3(0.0f, 0.0f, -6.0f), glm::vec3(0.05f), false);
-	//m_model eagle(glm::vec3(0.0f, 0.0f, -6.0f), glm::vec3(0.2f), false);
-	//dModel superHorny(glm::vec3(0.0f, 0.0f, -6.0f), glm::vec3(0.05f), false);
-	trollModel.loadModel("/Users/ulysses/Desktop/source/projects/game/source/assets/models/lotr_troll/scene.gltf");
-	//eagle.loadModel("/Users/ulysses/Desktop/source/projects/game/source/assets/models/eagle/scene.gltf");
-	//superHorny.loadModel("/Users/ulysses/Desktop/source/projects/game/source/assets/models/super_horny/scene.gltf");
+	m_model garbage(glm::vec3(0.0f, 0.0f, -6.0f), glm::vec3(1.0f), false);
+	garbage.loadModel("/Users/ulysses/Desktop/source/projects/game/source/assets/models/garbage/scene.gltf");
 
-	// lights
-	m_directLight DirectLight = { glm::vec3(-0.2f, -1.0f, -0.3f), glm::vec4(0.1f, 0.1f, 0.1f, 1.0f), glm::vec4(0.4f, 0.4f, 0.4f, 1.0f), glm::vec4(0.5f, 0.5f, 0.5f, 1.0f) };
-
-	spotLight uSpotLight = {
+	m_spotLight uSpotLight = {
 		camera::defaultCamera.cameraPosition, camera::defaultCamera.cameraFront,
 		glm::cos(glm::radians(20.5f)), glm::cos(glm::radians(25.5f)),
 		1.0f, 0.0f, 0.0f,
 		glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), glm::vec4(1.0f), glm::vec4(1.0f)
 	};
 
-	m_spotLight SpotLight = {
-		camera::defaultCamera.cameraPosition, camera::defaultCamera.cameraFront,
-		glm::cos(glm::radians(20.5f)), glm::cos(glm::radians(25.5f)),
-		1.0f, 0.0f, 0.0f,
-		glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), glm::vec4(1.0f), glm::vec4(1.0f)
-	};
-	// 	1.0f, 0.07f, 0.032f,
-	
-	VCube.init();
-	UCube.init();
 	UTerrain.init();
-
-	//vLightSource lamp = vLightSource(glm::vec3(1.0f), glm::vec3(0.05f), glm::vec3(0.8f), glm::vec3(1.0f), 1.0f, 0.09f, 0.032f, glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.25f));
-	//lamp.init();
 
 	// render loop
 	while (!Screen.shouldClose()) {
@@ -133,18 +118,6 @@ int main()
 		// render
 		Screen.update();
 		
-		//vShader.activate();
-
-		//vShader.set3flt("viewPos", camera::defaultCamera.cameraPosition);
-
-		//DirectLight.render(vShader);
-		//vShader.set_int("nPointLights", 1);
-		//lamp.PointLight.render(vShader, 0);
-
-		//SpotLight.position = camera::defaultCamera.cameraPosition;
-		//SpotLight.direction = camera::defaultCamera.cameraFront;
-		//SpotLight.render(vShader);
-
 		uShader.activate();
 
 		uShader.set3flt("viewPos", camera::defaultCamera.cameraPosition);
@@ -161,27 +134,11 @@ int main()
 			(float)screen::SCR_WIDTH / (float)screen::SCR_HEIGHT, 0.1f, 100.0f
 		);
 
-		//vShader.setmat4("view", view);
-		//vShader.setmat4("projection", projection);
-
 		uShader.setmat4("view", view);
 		uShader.setmat4("projection", projection);
 
-		//std::cout << camera::defaultCamera.cameraPosition.x << ' ' << camera::defaultCamera.cameraPosition.y << ' ' << camera::defaultCamera.cameraPosition.z << std::endl;
-
-
-		//trollModel.render(vShader);
-		//eagle.render(vShader);
-		//superHorny.render(vShader);
-		//VCube.render(vShader);
-		//UCube.render(uShader);
-		UTerrain.render(uShader);
-
-		lightSourceShader.activate();
-		lightSourceShader.setmat4("view", view);
-		lightSourceShader.setmat4("projection", projection);
-	
-		//lamp.render(lightSourceShader);
+		//UTerrain.render(uShader);
+		garbage.render(uShader);	
 
 		// send new frame to window
 		Screen.newFrame();
@@ -189,6 +146,7 @@ int main()
 	}
 	
 	UTerrain.cleanUp();
+	garbage.cleanUp();
 
 	// glfw: terminate, clearing all previously allocated GLFW resources.
 

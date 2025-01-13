@@ -48,7 +48,7 @@ void screen::setParameters() {
 
 void screen::update() {
 
-	glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
+	glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
@@ -67,4 +67,3 @@ void screen::setShouldClose(bool shouldClose) {
 
 	glfwSetWindowShouldClose(window, shouldClose);
 }
-
