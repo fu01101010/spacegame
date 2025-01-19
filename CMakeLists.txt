@@ -37,6 +37,7 @@ add_executable(game
 	"source/graphics/shader.cpp"
 	"source/graphics/utility/mesh.cpp"
 	"source/graphics/utility/weighedMesh.cpp"
+	"source/graphics/utility/weighedModel.cpp"
 	"source/graphics/utility/model.cpp"
 	"source/graphics/models/vcube.hpp"
 	"source/graphics/models/ucube.hpp"

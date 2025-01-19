@@ -13,6 +13,7 @@
 
 #include <vector>
 #include <string>
+#include <utility>
 
 #include "weighedMesh.h"
 
@@ -38,9 +39,8 @@ public:
 
 	void cleanUp();
 
+	std::vector<std::string> boneMap;
 protected:
-
-	unsigned int nVerticesAffectedByBones; // must be equal to nVertices
 
 	std::vector<weighedMesh> meshes;
 	std::string directory;
@@ -48,13 +48,8 @@ protected:
 	void processScene(const aiScene* scene);
 	weighedMesh processMesh(aiMesh* mesh);
 
-	std::vector<std::string> boneMap;
-	std::vector<std::vector<float> > vertexMap;
+	std::vector<std::vector<std::pair<int, float> >> vertexMap;
 
 	void processBone(unsigned int boneID, const aiBone* bone);
-
-	void updateVertexMap(unsigned int vertexID, unsigned int boneID, float weight);
-
-	void updateBoneMap(unsigned int boneID, const aiBone* bone);
-}
+};
 #endif

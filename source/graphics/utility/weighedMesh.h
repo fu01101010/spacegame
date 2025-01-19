@@ -13,8 +13,7 @@
 
 #include "../shader.h"
 
-
-#define MAX_BONES_PER_VERTEX 26
+#define MAX_BONES_PER_VERTEX 4
 
 
 
@@ -26,10 +25,9 @@ struct weighedVertex {
 	glm::vec3 position;
 	glm::vec3 normal;
 	glm::vec3 color;
-
-	std::vector<float> weightData = std::vector<float>(MAX_BONES_PER_VERTEX);
-
-	static std::vector<struct weighedVertex> genWVList(float* vertices, int nVertices, float* weights);
+	
+	glm::vec4 wvBoneData;
+	glm::vec4 weightData;
 };
 
 typedef struct weighedVertex weighedVertex;

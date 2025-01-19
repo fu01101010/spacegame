@@ -1,6 +1,6 @@
-#include "weighedMesh.h"
+#include "weighedModel.h"
 
-#define ASSIMP_LOAD_FLAGS (aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_JoinIdenticalVertices)
+#define ASSIMP_LOAD_FLAGS (aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_JoinIdenticalVertices | aiProcess_FlipUVs)
 
 weighedModel::weighedModel(glm::vec3 position, glm::vec3 size)
 	: position(position), size(size) { }
@@ -25,7 +25,7 @@ void weighedModel::render(shader Shader) {
 
 void weighedModel::cleanUp() {
 	
-	for (weighedMesh mesh : mesh) {
+	for (weighedMesh mesh : meshes) {
 		
 		mesh.cleanUp();
 	}
@@ -51,18 +51,18 @@ void weighedModel::processScene(const aiScene* scene) {
 	
 	for (unsigned int i = 0; i < scene->mNumMeshes; ++i) {
 		
-		const aiMesh* mesh = scene->mMeshes[i];
+		aiMesh* mesh = scene->mMeshes[i];
 
 		// resizing vertexMap
 		vertexMap.clear();
-		vertexMap.resize(mesh->mNumVertices);
+		vertexMap = std::vector<std::vector<std::pair<int, float> >> (mesh->mNumVertices);
 
 		// processing bones
 		if (mesh->HasBones()) {
 			
 			// resizing boneMap
 			boneMap.clear();
-			boneMap.resize(mesh->mNumBones);
+			boneMap = std::vector<std::string> (mesh->mNumBones);
 
 			for (unsigned int j = 0; j < mesh->mNumBones; ++j) {
 
@@ -78,7 +78,7 @@ void weighedModel::processScene(const aiScene* scene) {
 	}
 }
 
-weighedMesh processMesh(const aiMesh* mesh) {
+weighedMesh weighedModel::processMesh(aiMesh* mesh) {
 	
 	std::vector<weighedVertex> vertices;
 	std::vector<unsigned int> indices;
@@ -101,17 +101,31 @@ weighedMesh processMesh(const aiMesh* mesh) {
 			mesh->mNormals[i].y,
 			mesh->mNormals[i].z
 		);
+		
+		// color
+		vertex.color = glm::vec3(1.0f, 1.0f, 1.0f);
 
 		// weights
 		for (unsigned int j = 0; j < MAX_BONES_PER_VERTEX; ++j) {
 			
-			vertex.weightData.at(j) = vertexMap.at(i).at(j);	
+			if (vertexMap.at(i).size() > j) {
+				
+				vertex.wvBoneData[j] = vertexMap.at(i).at(j).first;
+
+				vertex.weightData[j] = vertexMap.at(i).at(j).second;
+			} else {
+				
+				vertex.wvBoneData[j] = (-1);
+				vertex.weightData[j] = (-1.0f);
+			}
 		}
+		
+		vertices.push_back(vertex);
 	}
 
 	// processing indices
 	for (unsigned int i = 0; i < mesh->mNumFaces; ++i) {
-
+		
 		aiFace face = mesh->mFaces[i];
 		for (unsigned int j = 0; j < face.mNumIndices; ++j) {
 
@@ -122,22 +136,14 @@ weighedMesh processMesh(const aiMesh* mesh) {
 	return weighedMesh(vertices, indices);
 }
 
-void processBone(unsigned int boneID, const aiBone* bone) {
+void weighedModel::processBone(unsigned int boneID, const aiBone* bone) {
 	
 	// updating boneMap
-	boneMap.at(i) = bone->mName.C_Str();
+	boneMap.at(boneID) = bone->mName.C_Str();
 	
-	for (int i = 0; i < bone->mNumWeights; ++i) {
-		
-		// adding new vertex if empty
-		if (vertexMap.at(mWeights[i].mVertexId).size() == 0) {
-			
-			std::vector<float> initDummy(MAX_BONES_PER_VERTEX, 0.0f);
-
-			vertexMap.at(mWeights[i].mVertexId) = initDummy;
-		}
+	for (unsigned int i = 0; i < bone->mNumWeights; ++i) {
 
 		// updating vertexMap
-		vertexMap.at(mWeights[i].mVertexId).at(boneID) = mWeights[i].mWeight;
+		vertexMap.at(bone->mWeights[i].mVertexId).push_back(std::pair<float, float> ({boneID, bone->mWeights[i].mWeight}));
 	}
 }
