@@ -43,6 +43,7 @@ public:
 
 	void setmat3(const std::string& name, glm::mat3 value);
 	void setmat4(const std::string& name, glm::mat4 value);
+	void setmat4(const std::string& name, aiMatrix4x4 value);
 };
 
 #endif

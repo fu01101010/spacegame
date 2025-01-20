@@ -12,13 +12,20 @@ out vec3 vsOutColor;
 out vec4 vsOutWVBones;
 out vec4 vsOutWeights;
 
+const int MAX_BONES = 26;
+uniform mat4 boneData[MAX_BONES];
+
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
 void main() {
+	mat4 boneTransform = boneData[int(vsInWVBones[0])] * vsInWeights[0];
+	boneTransform += boneData[int(vsInWVBones[1])] * vsInWeights[1];
+	boneTransform += boneData[int(vsInWVBones[2])] * vsInWeights[2];
+	boneTransform += boneData[int(vsInWVBones[3])] * vsInWeights[3];
 
-	vsOutFragPos	= vec3(model * vec4(vsInPosition, 1.0));
+	vsOutFragPos	= vec3(model * boneTransform * vec4(vsInPosition, 1.0));
 	vsOutNormal	= mat3(transpose(inverse(model))) * vsInNormal;
 
 	vsOutWVBones = vsInWVBones;

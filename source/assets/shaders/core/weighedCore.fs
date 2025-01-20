@@ -19,8 +19,10 @@ void main() {
 
 	
 	bool found = false;
+
+	if (false) {
 	for (int i = 0; i < 4; i++) {
-	
+		
 		if (vsOutWVBones[i] == nBone) {
 
 			found = true;
@@ -41,5 +43,8 @@ void main() {
 	if (!found) {
 		fragmentColor = vec4(0.0, 0.0, 1.0, 0.0);
 	}
+	}
+
+	fragmentColor = vec4(0.3, 0.3, 0.3, 0.0);
 }
 

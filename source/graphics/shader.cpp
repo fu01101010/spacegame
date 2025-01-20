@@ -135,3 +135,10 @@ void shader::setmat4(const std::string& name, glm::mat4 value) {
 
 	glUniformMatrix4fv(glGetUniformLocation(shaderID, name.c_str()), 1, GL_FALSE, glm::value_ptr(value));
 }
+
+void shader::setmat4(const std::string& name, aiMatrix4x4 m) {
+
+	glm::mat4 mat = {m.a1, m.b1, m.c1, m.d1, m.a2, m.b2, m.c2, m.d2, m.a3, m.b3, m.c3, m.d3, m.a4, m.b4, m.c4, m.d4};
+
+	glUniformMatrix4fv(glGetUniformLocation(shaderID, name.c_str()), 1, GL_FALSE, glm::value_ptr(mat));
+}

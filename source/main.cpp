@@ -49,6 +49,7 @@ double scrollDX, scrollDY;
 
 double deltaTime = 0.0f; // time inbetween frames
 double lastFrame = 0.0f; // time of last frame
+double currentTime = 0.0f;
 
 
 // temporary 
@@ -104,7 +105,7 @@ int main() {
 	m_model garbage(glm::vec3(0.0f, 0.0f, -6.0f), glm::vec3(1.0f), false);
 	garbage.loadModel("/Users/ulysses/Desktop/source/projects/game/source/assets/models/garbage/scene.gltf");
 
-	weighedModel coolmanny(glm::vec3(0.0f, 0.0f, -6.0f), glm::vec3(1.0f));
+	weighedModel coolmanny(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f));
 	coolmanny.load("/Users/ulysses/Desktop/source/projects/game/source/assets/models/coolmanny.glb");
 
 	m_spotLight uSpotLight = {
@@ -120,7 +121,10 @@ int main() {
 	while (!Screen.shouldClose()) {
 		
 		// calculate deltaTime
-		double currentTime = glfwGetTime();
+		currentTime = glfwGetTime();
+
+		//std::cout << currentTime << std::endl;
+
 		deltaTime = currentTime - lastFrame;
 		lastFrame = currentTime;
 
@@ -147,7 +151,7 @@ int main() {
 		);
 
 		weighedShader.set_flt("nBone", currentBone);
-		std::cout << " currentBone -> " << currentBone << " (" << coolmanny.boneMap.at(currentBone) << ')' << std::endl;
+		//std::cout << " currentBone -> " << currentBone << " (" << coolmanny.boneMap.at(currentBone) << ')' << std::endl;
 		weighedShader.setmat4("view", view);
 		weighedShader.setmat4("projection", projection);
 
