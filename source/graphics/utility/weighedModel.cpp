@@ -2,33 +2,37 @@
 
 #define ASSIMP_LOAD_FLAGS (aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_JoinIdenticalVertices | aiProcess_FlipUVs)
 
-weighedModel::weighedModel(glm::vec3 position, glm::vec3 size)
-	: position(position), size(size) { }
+
+weighedModel::weighedModel(glm::vec3 position, glm::vec3 size, bool noTex)
+	: position(position), size(size), noTex(noTex) {}
+
 
 void weighedModel::init() {}
+
 
 void weighedModel::render(shader Shader) {
 	
 	// in seconds
 	float time = glfwGetTime();
-	//std::cout << time << std::endl;
 
 	glm::mat4 model = glm::mat4(1.0f);
 
+	// update transform
 	model = glm::translate(model, position);
 	model = glm::scale(model, size);
 
+	// push to shader
 	Shader.setmat4("model", model);
-	//Shader.set_flt("Material.reflectivity", 0.5f);
+	Shader.set_flt("Material.reflectivity", 0.5f);
 	
 	// process transforms
 	std::vector<aiMatrix4x4> transforms;
 	
-	getBoneTransforms(transforms, time);
+	populateBoneTransforms(transforms, time);
 
 	for (unsigned int j = 0; j < transforms.size(); ++j) {
 			
-		std::string dummy("boneData["+std::to_string(j)+"]");
+		std::string dummy("boneData[" + std::to_string(j) + "]");
 		Shader.setmat4(dummy, transforms[j]);
 	}
 
@@ -38,6 +42,7 @@ void weighedModel::render(shader Shader) {
 	}
 }
 
+
 void weighedModel::cleanUp() {
 	
 	for (weighedMesh mesh : meshes) {
@@ -45,6 +50,7 @@ void weighedModel::cleanUp() {
 		mesh.cleanUp();
 	}
 }
+
 
 void weighedModel::load(std::string filepath) {
 	
@@ -55,6 +61,8 @@ void weighedModel::load(std::string filepath) {
 		std::cout << "weighedModel::error : could not load model @" << filepath << std::endl;
 		std::cout << importer.GetErrorString() << std::endl;
 	}
+	
+	// will set up later when standalone mat4 datatype will be avaliable
 
 	//globalInverseTransform = scene->mRootNode->mTransformation;
 	//globalInverseTransform = inverse(globalInverseTransform);
@@ -63,6 +71,7 @@ void weighedModel::load(std::string filepath) {
 
 	processScene(scene);
 }
+
 
 void weighedModel::processScene(const aiScene* scene) {
 	
@@ -95,10 +104,13 @@ void weighedModel::processScene(const aiScene* scene) {
 	}
 }
 
+
 weighedMesh weighedModel::processMesh(aiMesh* mesh) {
 	
 	std::vector<weighedVertex> vertices;
 	std::vector<unsigned int> indices;
+
+	std::vector<texture> textures;
 
 	// processing vertices
 	for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
@@ -121,6 +133,18 @@ weighedMesh weighedModel::processMesh(aiMesh* mesh) {
 		
 		// color
 		vertex.color = glm::vec3(1.0f, 1.0f, 1.0f);
+
+		// textureCoords
+		if (mesh->mTextureCoords[0]) {
+			
+			vertex.textureCoords = glm::vec2(
+					mesh->mTextureCoords[0][i].x,
+					mesh->mTextureCoords[0][i].y
+				);
+		} else {
+			
+			vertex.textureCoords = glm::vec2(0.0f);
+		}
 
 		// weights
 		for (unsigned int j = 0; j < MAX_BONES_PER_VERTEX; ++j) {
@@ -150,8 +174,76 @@ weighedMesh weighedModel::processMesh(aiMesh* mesh) {
 		}
 	}
 
-	return weighedMesh(vertices, indices);
+	// processing materials
+	if (mesh->mMaterialIndex >= 0) {
+		
+		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+
+		if (noTex) {
+			
+			aiColor4D diffMaps(1.0f);
+			aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &diffMaps);
+
+			aiColor4D specMaps(1.0f);
+			aiGetMaterialColor(material, AI_MATKEY_COLOR_SPECULAR, &specMaps);
+
+			return weighedMesh(vertices, indices, diffMaps, specMaps);
+		}
+
+		//diffMaps
+		std::vector<texture> diffMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE);
+		textures.insert(textures.end(), diffMaps.begin(), diffMaps.end());
+
+		//specMaps
+		std::vector<texture> specMaps = loadMaterialTextures(material, aiTextureType_SPECULAR);
+		textures.insert(textures.end(), specMaps.begin(), specMaps.end());
+	}
+
+	return weighedMesh(vertices, indices, textures);
 }
+
+
+std::vector<texture> weighedModel::loadMaterialTextures(aiMaterial* material, aiTextureType type) {
+
+	std::vector<texture> textures;
+
+	for (unsigned int i = 0; i < material->GetTextureCount(type); ++i) {
+
+		aiString helperString;
+
+		material->GetTexture(type, i, &helperString);
+		std::cout << helperString.C_Str() << std::endl;
+
+		//prevent duplicate loading
+		bool helperSkipFlag = false;
+
+		for (unsigned int j = 0; j < texturesLoaded.size(); ++j) {
+
+			if (std::strcmp(texturesLoaded[j].path.data(), helperString.C_Str()) == 0) {
+
+				textures.push_back(texturesLoaded[j]);
+
+				helperSkipFlag = true;
+				break;
+			}
+		}
+
+		if (!helperSkipFlag) {
+
+			std::cout << directory << "///" << helperString.C_Str() << std::endl;
+
+			//not loaded yet
+			texture tex(directory, helperString.C_Str(), type);
+			
+			tex.load();
+			textures.push_back(tex);
+			texturesLoaded.push_back(tex);
+		}
+	}
+
+	return textures;
+}
+
 
 void weighedModel::processBone(unsigned int boneID, const aiBone* bone) {
 	
@@ -171,9 +263,10 @@ void weighedModel::processBone(unsigned int boneID, const aiBone* bone) {
 	}
 }
 
-void weighedModel::getBoneTransforms(std::vector<aiMatrix4x4>& boneTransforms, float time) {
+
+void weighedModel::populateBoneTransforms(std::vector<aiMatrix4x4>& boneTransforms, float time) {
 	
-	// create identity matrix
+	// create identity matrix (identity provided by default constructor)
 	aiMatrix4x4 identity;
 
 	// calculate ticks per second
@@ -182,7 +275,6 @@ void weighedModel::getBoneTransforms(std::vector<aiMatrix4x4>& boneTransforms, f
 	float animTimeInTicks = std::fmod(timeInTicks, (float)scene->mAnimations[0]->mDuration);
 	
 	boneTransforms.resize(boneData.size());
-
 	
 	readNodeHierarchy(scene->mRootNode, identity, animTimeInTicks);
 
@@ -191,6 +283,7 @@ void weighedModel::getBoneTransforms(std::vector<aiMatrix4x4>& boneTransforms, f
 		boneTransforms[i] = boneData[i].endTransform;
 	}
 }
+
 
 void weighedModel::readNodeHierarchy(const aiNode* node, const aiMatrix4x4& parentTransform, float time) {
 	
@@ -231,6 +324,7 @@ void weighedModel::readNodeHierarchy(const aiNode* node, const aiMatrix4x4& pare
 		
 		if (boneMap[i] == name) {
 			
+			// add inverse global transform here when done
 			boneData[i].endTransform = globalTransform * boneData[i].offsetMatrix;
 			break;
 		}
@@ -242,15 +336,17 @@ void weighedModel::readNodeHierarchy(const aiNode* node, const aiMatrix4x4& pare
 	}
 }
 
+
 aiMatrix4x4 weighedModel::GLMMatrixToAssimp(glm::mat4 mat) {
 	
-	aiMatrix4x4 assimpMat = aiMatrix4x4(	mat[0][0], mat[1][0], mat[2][0], mat[3][0],
-						mat[0][1], mat[1][1], mat[2][1], mat[3][1],
-						mat[0][2], mat[1][2], mat[2][2], mat[3][2],
-						mat[0][3], mat[1][3], mat[2][3], mat[3][3]);
+	aiMatrix4x4 assimpMat = aiMatrix4x4(mat[0][0], mat[1][0], mat[2][0], mat[3][0],
+					    mat[0][1], mat[1][1], mat[2][1], mat[3][1],
+					    mat[0][2], mat[1][2], mat[2][2], mat[3][2],
+					    mat[0][3], mat[1][3], mat[2][3], mat[3][3]);
 
 	return assimpMat;
 }
+
 
 const aiNodeAnim* weighedModel::findNodeAnim(const aiAnimation* animation, const std::string name) {
 	
@@ -266,6 +362,7 @@ const aiNodeAnim* weighedModel::findNodeAnim(const aiAnimation* animation, const
 
 	return nullptr;
 }
+
 
 unsigned int weighedModel::findTranslationIndex(float time, const aiNodeAnim* nodeAnim) {
 	
@@ -283,6 +380,7 @@ unsigned int weighedModel::findTranslationIndex(float time, const aiNodeAnim* no
 
 	return 0;
 }
+
 
 void weighedModel::calculateInterpolatedTranslation(aiVector3D& translation, float time, const aiNodeAnim* nodeAnim) {
 	
@@ -305,6 +403,8 @@ void weighedModel::calculateInterpolatedTranslation(aiVector3D& translation, flo
 
 	float factor = (time - tick1) / deltaTime;
 
+	// ???
+	// sometimes negative and less than ~-1.0f
 	//assert(factor >= 0.0f && factor <= 1.0f);
 
 	const aiVector3D& start = nodeAnim->mPositionKeys[translationIndex].mValue;
@@ -314,6 +414,7 @@ void weighedModel::calculateInterpolatedTranslation(aiVector3D& translation, flo
 
 	translation = start + factor * delta;
 }
+
 
 unsigned int weighedModel::findRotationIndex(float time, const aiNodeAnim* nodeAnim) {
 	
@@ -331,6 +432,7 @@ unsigned int weighedModel::findRotationIndex(float time, const aiNodeAnim* nodeA
 	
 	return 0;
 }
+
 
 void weighedModel::calculateInterpolatedRotation(aiQuaternion& rotation, float time, const aiNodeAnim* nodeAnim) {
 	
@@ -351,8 +453,10 @@ void weighedModel::calculateInterpolatedRotation(aiQuaternion& rotation, float t
 
 	float deltaTime = tick2 - tick1;
 
-	float factor = (time - tick1) / deltaTime;
+	float factor = (time - tick1) / deltaTime; 
 
+	// ???
+	// sometimes negative and less than ~-1.0f
 	//assert(factor >= 0.0f && factor <= 1.0f);
 
 	const aiQuaternion& start = nodeAnim->mRotationKeys[rotationIndex].mValue;
@@ -362,6 +466,7 @@ void weighedModel::calculateInterpolatedRotation(aiQuaternion& rotation, float t
 
 	rotation.Normalize();	
 }
+
 
 unsigned int weighedModel::findScalingIndex(float time, const aiNodeAnim* nodeAnim) {
 	
@@ -379,6 +484,7 @@ unsigned int weighedModel::findScalingIndex(float time, const aiNodeAnim* nodeAn
 
 	return 0;
 }
+
 
 void weighedModel::calculateInterpolatedScaling(aiVector3D& scaling, float time, const aiNodeAnim* nodeAnim) {
 	
@@ -400,7 +506,9 @@ void weighedModel::calculateInterpolatedScaling(aiVector3D& scaling, float time,
 	float deltaTime = tick2 - tick1;
 
 	float factor = (time - tick1) / deltaTime;
-
+	
+	// ???
+	// sometimes negative and less than ~-1.0f
 	//assert(factor >= 0.0f && factor <= 1.0f);
 
 	const aiVector3D& start = nodeAnim->mScalingKeys[scalingIndex].mValue;

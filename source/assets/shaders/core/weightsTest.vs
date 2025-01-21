@@ -38,4 +38,3 @@ void main() {
 	vsOutWVBones = vsInWVBones;
 	vsOutWeights = vsInWeights;
 }
-

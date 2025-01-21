@@ -67,4 +67,33 @@ public:
 	std::string path;
 };
 
+
+
+
+
+
+//
+//
+// normal texture class
+
+class texture {
+
+public:
+
+	texture();
+	texture(std::string directory, std::string path, aiTextureType type);
+
+	void generate();
+	void load();
+
+	void bind();
+
+	//texture object
+	unsigned int id;
+	aiTextureType type;
+
+	std::string directory;
+	std::string path;
+};
+
 #endif

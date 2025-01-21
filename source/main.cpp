@@ -102,11 +102,11 @@ int main() {
 	shader weighedShader("/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/core/weighedCore.vs", "/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/core/weighedCore.fs");
 
 
-	m_model garbage(glm::vec3(0.0f, 0.0f, -6.0f), glm::vec3(1.0f), false);
-	garbage.loadModel("/Users/ulysses/Desktop/source/projects/game/source/assets/models/garbage/scene.gltf");
+	//m_model garbage(glm::vec3(0.0f, 0.0f, -6.0f), glm::vec3(1.0f), false);
+	//garbage.loadModel("/Users/ulysses/Desktop/source/projects/game/source/assets/models/garbage/scene.gltf");
 
-	weighedModel coolmanny(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f));
-	coolmanny.load("/Users/ulysses/Desktop/source/projects/game/source/assets/models/coolmanny.glb");
+	weighedModel coolmanny(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f), false);
+	coolmanny.load("/Users/ulysses/Desktop/source/projects/game/source/assets/models/coolmanny3/coolmanny3.gltf");
 
 	m_spotLight uSpotLight = {
 		camera::defaultCamera.cameraPosition, camera::defaultCamera.cameraFront,
@@ -138,9 +138,9 @@ int main() {
 
 		weighedShader.set3flt("viewPos", camera::defaultCamera.cameraPosition);
 
-		//uSpotLight.position = camera::defaultCamera.cameraPosition;
-		//uSpotLight.direction = camera::defaultCamera.cameraFront;
-		//uSpotLight.render(uShader);				
+		uSpotLight.position = camera::defaultCamera.cameraPosition;
+		uSpotLight.direction = camera::defaultCamera.cameraFront;
+		uSpotLight.render(weighedShader);				
 
 		glm::mat4 view = glm::mat4(1.0f);
 		glm::mat4 projection = glm::mat4(1.0f);
@@ -165,7 +165,7 @@ int main() {
 	}
 	
 	UTerrain.cleanUp();
-	garbage.cleanUp();
+	//garbage.cleanUp();
 	coolmanny.cleanUp();
 
 	// glfw: terminate, clearing all previously allocated GLFW resources.
