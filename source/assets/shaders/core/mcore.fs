@@ -65,7 +65,8 @@ out vec4 fragmentColor;
 
 in vec3 vsOutFragPos;
 in vec3 vsOutNormal;
-in vec2 vsOutTexCoord;
+in vec3 vsOutColor;
+in vec2 vsOutTextureCoords;
 
 uniform material Material;
 
@@ -85,8 +86,8 @@ void main() {
 		texSpec = Material.specular;
 	} else {
 		
-		texDiff = texture(diffuse0, vsOutTexCoord);
-		texSpec = texture(specular0, vsOutTexCoord);
+		texDiff = texture(diffuse0, vsOutTextureCoords);
+		texSpec = texture(specular0, vsOutTextureCoords);
 	}
 
 	vec4 retval;

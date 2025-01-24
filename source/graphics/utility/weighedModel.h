@@ -21,7 +21,7 @@
 
 //
 //
-// weighed model class
+// weighed model class here
 class weighedModel {
 	
 public:
@@ -100,4 +100,5 @@ protected:
 	unsigned int findScalingIndex(float time, const aiNodeAnim* nodeAnim);
 	void calculateInterpolatedScaling(aiVector3D& scaling, float time, const aiNodeAnim* nodeAnim);
 };
+
 #endif

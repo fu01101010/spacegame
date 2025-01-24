@@ -4,6 +4,10 @@
 #define ASSIMP_LOAD_FLAGS (aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_JoinIdenticalVertices | aiProcess_FlipUVs)
 
 
+
+//
+//
+// static model class here
 weighedModel::weighedModel(glm::vec3 position, glm::vec3 size, bool noTex)
 	: position(position), size(size), noTex(noTex) {}
 

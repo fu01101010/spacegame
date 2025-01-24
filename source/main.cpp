@@ -19,6 +19,7 @@
 
 #include "../source/graphics/utility/model.h"
 #include "../source/graphics/utility/weighedModel.h"
+#include "../source/graphics/utility/staticModel.h"
 #include "../source/graphics/light.h"
 
 #include "../source/graphics/models/vcube.hpp"
@@ -102,8 +103,8 @@ int main() {
 	shader weighedShader("/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/core/weighedCore.vs", "/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/core/weighedCore.fs");
 
 
-	m_model garbage(glm::vec3(0.0f, 0.0f, -6.0f), glm::vec3(1.0f), false);
-	garbage.loadModel("/Users/ulysses/Desktop/source/projects/game/source/assets/models/garbage/scene.gltf");
+	staticModel garbage(glm::vec3(0.0f, 0.0f, -6.0f), glm::vec3(1.0f), false);
+	garbage.load("/Users/ulysses/Desktop/source/projects/game/source/assets/models/garbage/scene.gltf");
 
 	weighedModel coolmanny(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f), false);
 	coolmanny.load("/Users/ulysses/Desktop/source/projects/game/source/assets/models/coolmanny4/coolmanny.gltf");

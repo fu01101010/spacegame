@@ -38,8 +38,6 @@ struct weighedVertex {
 
 typedef struct weighedVertex weighedVertex;
 
-
-
 //
 //
 // weighed mesh class here
