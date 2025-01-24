@@ -1,4 +1,5 @@
 #include "weighedModel.h"
+#include "../source/utility/math/mat.h"
 
 #define ASSIMP_LOAD_FLAGS (aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_JoinIdenticalVertices | aiProcess_FlipUVs)
 
@@ -63,11 +64,14 @@ void weighedModel::load(std::string filepath) {
 	}
 	
 	// will set up later when standalone mat4 datatype will be avaliable
+	// now in the form of namespace with a few funcs will upgrade much later
 
-	//globalInverseTransform = scene->mRootNode->mTransformation;
-	//globalInverseTransform = inverse(globalInverseTransform);
+	globalInverseTransform = scene->mRootNode->mTransformation;
+	globalInverseTransform = mat::inverse(globalInverseTransform);
 	
 	directory = filepath.substr(0, filepath.find_last_of("/"));
+
+	currentAnim = 0;
 
 	processScene(scene);
 }
@@ -289,7 +293,7 @@ void weighedModel::readNodeHierarchy(const aiNode* node, const aiMatrix4x4& pare
 	
 	std::string name = node->mName.data;
 
-	const aiAnimation* animation = scene->mAnimations[0];
+	const aiAnimation* animation = scene->mAnimations[currentAnim];
 	const aiNodeAnim* nodeAnim = findNodeAnim(animation, name);
 
 	aiMatrix4x4 nodeTransform(node->mTransformation);
@@ -313,7 +317,7 @@ void weighedModel::readNodeHierarchy(const aiNode* node, const aiMatrix4x4& pare
 		glm::mat4 interpolatedTranslation = glm::mat4(1.0f);
 		interpolatedTranslation = translate(interpolatedTranslation, glm::vec3(translation.x, translation.y, translation.z));
 
-		nodeTransform = GLMMatrixToAssimp(interpolatedTranslation) * interpolatedRotation * GLMMatrixToAssimp(interpolatedScaling);
+		nodeTransform = mat::GLMToAI(interpolatedTranslation) * interpolatedRotation * mat::GLMToAI(interpolatedScaling);
 	}
 
 	//printf("%s - ", name.c_str());
@@ -325,7 +329,7 @@ void weighedModel::readNodeHierarchy(const aiNode* node, const aiMatrix4x4& pare
 		if (boneMap[i] == name) {
 			
 			// add inverse global transform here when done
-			boneData[i].endTransform = globalTransform * boneData[i].offsetMatrix;
+			boneData[i].endTransform = globalInverseTransform * globalTransform * boneData[i].offsetMatrix;
 			break;
 		}
 	}
@@ -334,17 +338,6 @@ void weighedModel::readNodeHierarchy(const aiNode* node, const aiMatrix4x4& pare
 		
 		readNodeHierarchy(node->mChildren[i], globalTransform, time);
 	}
-}
-
-
-aiMatrix4x4 weighedModel::GLMMatrixToAssimp(glm::mat4 mat) {
-	
-	aiMatrix4x4 assimpMat = aiMatrix4x4(mat[0][0], mat[1][0], mat[2][0], mat[3][0],
-					    mat[0][1], mat[1][1], mat[2][1], mat[3][1],
-					    mat[0][2], mat[1][2], mat[2][2], mat[3][2],
-					    mat[0][3], mat[1][3], mat[2][3], mat[3][3]);
-
-	return assimpMat;
 }
 
 

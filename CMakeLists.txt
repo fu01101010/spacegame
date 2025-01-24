@@ -48,6 +48,7 @@ add_executable(game
 	"source/io/mouse.cpp"
 	"source/io/screen.cpp"
 	"source/utility/terrain/terrain.cpp"
+	"source/utility/math/mat.cpp"
 	"source/main.cpp"
 )
 

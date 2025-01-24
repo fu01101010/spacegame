@@ -29,6 +29,9 @@ public:
 	glm::vec3 position;
 	glm::vec3 size;
 
+	int nAnims;
+	int currentAnim;
+
 	weighedModel(glm::vec3 position = glm::vec3(0.0f), glm::vec3 size = glm::vec3(0.0f), bool noTex = false);
 
 	std::vector<std::string> boneMap;
@@ -84,7 +87,6 @@ protected:
 	
 	void readNodeHierarchy(const aiNode* node, const aiMatrix4x4& parentTransform, float time);
 
-	aiMatrix4x4 GLMMatrixToAssimp(glm::mat4 mat);
 	aiMatrix4x4 globalInverseTransform;
 
 	const aiNodeAnim* findNodeAnim(const aiAnimation* animation, const std::string name);

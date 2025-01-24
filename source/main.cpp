@@ -31,10 +31,7 @@
 #include "../source/io/camera.h"
 
 #include "../source/utility/terrain/terrain.h"
-
-
-int currentBone = 6;
-
+#include "../source/utility/math/mat.h"
 
 
 // funcs here
@@ -59,6 +56,9 @@ bool wireframeFlag = false;
 
 terrain UTerrain = terrain(material::black_plastic, glm::vec3(0.0f), "/Users/ulysses/Desktop/source/projects/game/source/assets/heightMaps/image.jpg", 0.01f);
 
+int currentBone = 6;
+
+int currentAnim = 0;
 
 
 // main
@@ -102,11 +102,11 @@ int main() {
 	shader weighedShader("/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/core/weighedCore.vs", "/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/core/weighedCore.fs");
 
 
-	//m_model garbage(glm::vec3(0.0f, 0.0f, -6.0f), glm::vec3(1.0f), false);
-	//garbage.loadModel("/Users/ulysses/Desktop/source/projects/game/source/assets/models/garbage/scene.gltf");
+	m_model garbage(glm::vec3(0.0f, 0.0f, -6.0f), glm::vec3(1.0f), false);
+	garbage.loadModel("/Users/ulysses/Desktop/source/projects/game/source/assets/models/garbage/scene.gltf");
 
 	weighedModel coolmanny(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f), false);
-	coolmanny.load("/Users/ulysses/Desktop/source/projects/game/source/assets/models/coolmanny3/coolmanny3.gltf");
+	coolmanny.load("/Users/ulysses/Desktop/source/projects/game/source/assets/models/coolmanny4/coolmanny.gltf");
 
 	m_spotLight uSpotLight = {
 		camera::defaultCamera.cameraPosition, camera::defaultCamera.cameraFront,
@@ -118,6 +118,18 @@ int main() {
 	UTerrain.init();
 
 	// render loop
+	glm::mat4 view = glm::mat4(1.0f);
+	glm::mat4 projection = glm::mat4(1.0f);
+
+	aiMatrix4x4 test = aiMatrix4x4(1.0f, 3.0f, 1.0f, 4.0f, 3.0f, 9.0f, 5.0f, 15.0f, 0.0f, 2.0f, 1.0f, 1.0f, 0.0f, 4.0f, 2.0f, 3.0f);
+	glm::mat4 q1 = mat::AIToGLM(mat::inverse(test));
+	mat::print(mat::inverse(test));
+
+	mat::print(mat::inverse(test));
+
+	mat::print(q1*mat::AIToGLM(test));
+
+
 	while (!Screen.shouldClose()) {
 		
 		// calculate deltaTime
@@ -142,8 +154,8 @@ int main() {
 		uSpotLight.direction = camera::defaultCamera.cameraFront;
 		uSpotLight.render(weighedShader);				
 
-		glm::mat4 view = glm::mat4(1.0f);
-		glm::mat4 projection = glm::mat4(1.0f);
+		view = glm::mat4(1.0f);
+		projection = glm::mat4(1.0f);
 		view = camera::defaultCamera.getViewMatrix();
 		projection = glm::perspective(
 			glm::radians(camera::defaultCamera.zoom), 
@@ -154,10 +166,31 @@ int main() {
 		//std::cout << " currentBone -> " << currentBone << " (" << coolmanny.boneMap.at(currentBone) << ')' << std::endl;
 		weighedShader.setmat4("view", view);
 		weighedShader.setmat4("projection", projection);
-
 		//UTerrain.render(uShader);
-		//garbage.render(uShader);
-		coolmanny.render(weighedShader);	
+		coolmanny.currentAnim = currentAnim;
+		coolmanny.render(weighedShader);
+		
+		uShader.activate();
+
+		uShader.set3flt("viewPos", camera::defaultCamera.cameraPosition);
+
+		uSpotLight.position = camera::defaultCamera.cameraPosition;
+		uSpotLight.direction = camera::defaultCamera.cameraFront;
+		uSpotLight.render(uShader);				
+
+		view = glm::mat4(1.0f);
+		projection = glm::mat4(1.0f);
+		view = camera::defaultCamera.getViewMatrix();
+		projection = glm::perspective(
+			glm::radians(camera::defaultCamera.zoom), 
+			(float)screen::SCR_WIDTH / (float)screen::SCR_HEIGHT, 0.1f, 100.0f
+		);
+		
+		uShader.setmat4("view", view);
+		uShader.setmat4("projection", projection);
+
+		garbage.render(uShader);
+	
 
 		// send new frame to window
 		Screen.newFrame();
@@ -165,7 +198,7 @@ int main() {
 	}
 	
 	UTerrain.cleanUp();
-	//garbage.cleanUp();
+	garbage.cleanUp();
 	coolmanny.cleanUp();
 
 	// glfw: terminate, clearing all previously allocated GLFW resources.
@@ -220,6 +253,16 @@ void processInput(double deltaTime) {
 			
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		}
+	}
+
+	if (keyboard::keyWentDn(GLFW_KEY_O)) {
+		
+		currentAnim += 1;
+	}
+
+	if (keyboard::keyWentDn(GLFW_KEY_P)) {
+		
+		currentAnim -= 1;
 	}
 
 	dx = mouse::getDX();
