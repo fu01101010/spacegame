@@ -14,8 +14,12 @@
 
 #include <stb/stb_image.h>
 
+#include <ft2build.h>
+#include <freetype/freetype.h>
+
 #include "../source/graphics/shader.h"
 #include "../source/graphics/textures/texture.h"
+#include "../source/graphics/text/text.h"
 
 #include "../source/graphics/utility/model.h"
 #include "../source/graphics/utility/weighedModel.h"
@@ -61,6 +65,13 @@ int currentBone = 6;
 
 int currentAnim = 0;
 
+weighedModel coolmanny(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f), false);
+
+bool blinn = false;
+bool gammaCorrection = false;
+
+FT_Library ft;
+ftText testText = ftText(32);
 
 // main
 int main() {
@@ -90,11 +101,26 @@ int main() {
 	// glad: load all OpenGL function pointers
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		
-		std::cout << "Failed to initialize GLAD" << std::endl;
+		std::cout << "failed to initialize GLAD" << std::endl;
 		return -1;
 	}
 
 	Screen.setParameters();
+
+	// init freetypelib
+	if (FT_Init_FreeType(&ft)) {
+		
+		std::cout << "failed to initialize freetype lib" << std::endl;
+		return -1;
+	}
+
+	if (!testText.load(ft, "/Users/ulysses/Desktop/source/projects/game/source/assets/fonts/mac/Monaco.ttf")) {
+		
+		std::cout << "failed to load font" << std::endl;
+		return -1;
+	}
+
+	FT_Done_FreeType(ft);
 
 	// shaders
 	shader mShader("/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/core/ucore.vs", "/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/core/ucore.fs");
@@ -102,11 +128,14 @@ int main() {
 
 	shader weighedShader("/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/core/weighedCore.vs", "/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/core/weighedCore.fs");
 
+	shader textShader("/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/core/textCore.vs", "/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/core/textCore.fs");
 
 	staticModel garbage(glm::vec3(0.0f, 0.0f, -6.0f), glm::vec3(1.0f), false);
 	garbage.load("/Users/ulysses/Desktop/source/projects/game/source/assets/models/garbage/scene.gltf");
 
-	weighedModel coolmanny(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f), false);
+	ucube UCube = ucube(material::black_rubber, glm::vec3(5.0f, 0.0f, 0.0f), glm::vec3(1.0f));
+	UCube.init();
+
 	coolmanny.load("/Users/ulysses/Desktop/source/projects/game/source/assets/models/coolmanny4/coolmanny.gltf");
 
 	m_spotLight uSpotLight = {
@@ -121,15 +150,7 @@ int main() {
 	// render loop
 	glm::mat4 view = glm::mat4(1.0f);
 	glm::mat4 projection = glm::mat4(1.0f);
-
-	aiMatrix4x4 test = aiMatrix4x4(1.0f, 3.0f, 1.0f, 4.0f, 3.0f, 9.0f, 5.0f, 15.0f, 0.0f, 2.0f, 1.0f, 1.0f, 0.0f, 4.0f, 2.0f, 3.0f);
-	glm::mat4 q1 = mat::AIToGLM(mat::inverse(test));
-	mat::print(mat::inverse(test));
-
-	mat::print(mat::inverse(test));
-
-	mat::print(q1*mat::AIToGLM(test));
-
+	glm::mat4 textProjection = glm::mat4(1.0f);
 
 	while (!Screen.shouldClose()) {
 		
@@ -144,54 +165,70 @@ int main() {
 		// process input
 		processInput(deltaTime);
 
-		// render
+		// update screen
 		Screen.update();
+
+		view = glm::mat4(1.0f);
+		projection = glm::mat4(1.0f);
+		view = camera::defaultCamera.getViewMatrix();
+		projection = glm::perspective(
+			glm::radians(camera::defaultCamera.zoom), 
+			(float)screen::SCR_WIDTH / (float)screen::SCR_HEIGHT, 0.1f, 100.0f
+		);
+		textProjection = glm::ortho(0.0f, (float)screen::SCR_WIDTH, 0.0f, (float)screen::SCR_HEIGHT);
+
+		// lighting
+		uSpotLight.position = camera::defaultCamera.cameraPosition;
+		uSpotLight.direction = camera::defaultCamera.cameraFront;
+
 		
+		// render (send data to shaders)		
+
 		weighedShader.activate();
 
 		weighedShader.set3flt("viewPos", camera::defaultCamera.cameraPosition);
 
-		uSpotLight.position = camera::defaultCamera.cameraPosition;
-		uSpotLight.direction = camera::defaultCamera.cameraFront;
-		uSpotLight.render(weighedShader);				
-
-		view = glm::mat4(1.0f);
-		projection = glm::mat4(1.0f);
-		view = camera::defaultCamera.getViewMatrix();
-		projection = glm::perspective(
-			glm::radians(camera::defaultCamera.zoom), 
-			(float)screen::SCR_WIDTH / (float)screen::SCR_HEIGHT, 0.1f, 100.0f
-		);
-
 		weighedShader.set_flt("nBone", currentBone);
-		//std::cout << " currentBone -> " << currentBone << " (" << coolmanny.boneMap.at(currentBone) << ')' << std::endl;
 		weighedShader.setmat4("view", view);
 		weighedShader.setmat4("projection", projection);
-		//UTerrain.render(uShader);
+
 		coolmanny.currentAnim = currentAnim;
-		coolmanny.render(weighedShader);
+		coolmanny.render(weighedShader, currentTime);
 		
+		uSpotLight.render(weighedShader);
+
 		uShader.activate();
 
 		uShader.set3flt("viewPos", camera::defaultCamera.cameraPosition);
-
-		uSpotLight.position = camera::defaultCamera.cameraPosition;
-		uSpotLight.direction = camera::defaultCamera.cameraFront;
-		uSpotLight.render(uShader);				
-
-		view = glm::mat4(1.0f);
-		projection = glm::mat4(1.0f);
-		view = camera::defaultCamera.getViewMatrix();
-		projection = glm::perspective(
-			glm::radians(camera::defaultCamera.zoom), 
-			(float)screen::SCR_WIDTH / (float)screen::SCR_HEIGHT, 0.1f, 100.0f
-		);
 		
 		uShader.setmat4("view", view);
 		uShader.setmat4("projection", projection);
 
+		uShader.setbool("blinn", blinn);
+		uShader.setbool("gamma", gammaCorrection);
+
+		uSpotLight.render(uShader);
+
 		garbage.render(uShader);
-	
+
+		mShader.activate();
+
+		mShader.set3flt("viewPos", camera::defaultCamera.cameraPosition);
+		
+		mShader.setmat4("view", view);
+		mShader.setmat4("projection", projection);
+
+		UCube.render(mShader);
+
+		// text!!!
+		textShader.activate();
+		textShader.setmat4("projection", textProjection);
+		testText.render(textShader, std::string("time: " + std::to_string(currentTime)), 10.0f, (float)screen::SCR_HEIGHT - 20.0f, glm::vec2(0.5f), glm::vec3(0.2f));
+		testText.render(textShader, std::string("fps: " + std::to_string(1/deltaTime)), 10.0f, (float)screen::SCR_HEIGHT - 35.0f, glm::vec2(0.5f), glm::vec3(0.2f));
+
+
+
+		//UTerrain.render(uShader);
 
 		// send new frame to window
 		Screen.newFrame();
@@ -201,6 +238,8 @@ int main() {
 	UTerrain.cleanUp();
 	garbage.cleanUp();
 	coolmanny.cleanUp();
+	UCube.cleanUp();
+	testText.cleanUp();
 
 	// glfw: terminate, clearing all previously allocated GLFW resources.
 
@@ -238,11 +277,12 @@ void processInput(double deltaTime) {
 
 		camera::defaultCamera.updateCameraPosition(cameraDirection::UP, deltaTime);
 	}
-	if (keyboard::key(GLFW_KEY_LEFT_SHIFT)) {
+	if (keyboard::key(GLFW_KEY_Z)) {
 		
 		camera::defaultCamera.updateCameraPosition(cameraDirection::DOWN, deltaTime);
 	}
-
+	
+	
 	if (keyboard::keyWentDn(GLFW_KEY_R)) {
 		
 		wireframeFlag = !wireframeFlag;
@@ -255,6 +295,17 @@ void processInput(double deltaTime) {
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		}
 	}
+
+	if (keyboard::keyWentDn(GLFW_KEY_B)) {
+		
+		blinn = !blinn;
+	}
+
+	if (keyboard::keyWentDn(GLFW_KEY_G)) {
+		
+		gammaCorrection = !gammaCorrection;
+	}
+
 
 	if (keyboard::keyWentDn(GLFW_KEY_O)) {
 		
@@ -280,14 +331,25 @@ void processInput(double deltaTime) {
 
 		camera::defaultCamera.updateCameraZoom(scrollDY);
 	}
+	
 
-	if (keyboard::keyWentDn(GLFW_KEY_UP)) {
+	if (keyboard::key(GLFW_KEY_UP)) {
 
-		if (currentBone < 25) currentBone++;
+		coolmanny.position.x += 0.05f;
 	}
 
-	if (keyboard::keyWentDn(GLFW_KEY_DOWN)) {
+	if (keyboard::key(GLFW_KEY_DOWN)) {
 		
-		if (currentBone > 0) currentBone--;
+		coolmanny.position.x -= 0.05f;
+	}
+
+	if (keyboard::key(GLFW_KEY_RIGHT)) {
+
+		coolmanny.position.z += 0.05f;
+	}
+
+	if (keyboard::key(GLFW_KEY_LEFT)) {
+		
+		coolmanny.position.z -= 0.05f;
 	}
 }

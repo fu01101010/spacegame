@@ -18,6 +18,10 @@ set( ASSIMP_SHARED_LIB
 	"${PROJECT_SOURCE_DIR}/libs/assimp/lib-x86_64/libassimp.5.dylib"
 )
 
+set( FREETYPE2_SHARED_LIB
+	"${PROJECT_SOURCE_DIR}/libs/freetype2/lib-x86_64/libfreetype.6.20.2.dylib"
+)
+
 set ( STB_IMAGE
 	"${PROJECT_SOURCE_DIR}/libs/stb/stb_image.cpp"	
 )
@@ -26,12 +30,14 @@ set ( ALL_LIBS
 	${OpenGL}
 	${GLFW_SHARED_LIB}
 	${ASSIMP_SHARED_LIB}
+	${FREETYPE2_SHARED_LIB}
 	${STB_IMAGE}
 	"-ldl"
 )
 
 add_executable(game 
 	"source/glad.c"
+	"source/graphics/text/text.cpp"
 	"source/graphics/light.cpp"
 	"source/graphics/utility/material.cpp"
 	"source/graphics/shader.cpp"
@@ -51,6 +57,7 @@ add_executable(game
 	"source/io/screen.cpp"
 	"source/utility/terrain/terrain.cpp"
 	"source/utility/math/mat.cpp"
+	"source/utility/scene/scene.cpp"
 	"source/main.cpp"
 )
 

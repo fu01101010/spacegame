@@ -90,7 +90,11 @@ public:
 		Shader.set3flt("Material.specular", Material.specular);
 		Shader.set_flt("Material.reflectivity", Material.reflectivity);
 
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
 		u_model::render(Shader);
+
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
 };
 

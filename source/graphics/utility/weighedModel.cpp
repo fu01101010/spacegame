@@ -15,10 +15,10 @@ weighedModel::weighedModel(glm::vec3 position, glm::vec3 size, bool noTex)
 void weighedModel::init() {}
 
 
-void weighedModel::render(shader Shader) {
+void weighedModel::render(shader Shader, float time) {
 	
 	// in seconds
-	float time = glfwGetTime();
+	//float time = glfwGetTime();
 
 	glm::mat4 model = glm::mat4(1.0f);
 

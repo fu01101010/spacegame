@@ -40,7 +40,7 @@ public:
 
 	void load(std::string filepath);
 
-	void render(shader Shader);
+	void render(shader Shader, float time);
 
 	void cleanUp();
 

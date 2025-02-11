@@ -72,6 +72,9 @@ uniform material Material;
 
 uniform vec3 viewPos;
 
+uniform bool blinn;
+uniform bool gamma;
+
 void main() {
 
 	vec3 normal	= normalize(vsOutNormal);
@@ -104,6 +107,11 @@ void main() {
 	//SpotLight	
 	retval += calculateSpotLight(normal, viewDir, texDiff, texSpec);
 
+	if (gamma) {
+		
+		retval.rgb = pow(retval.rgb, vec3(1.0 / 2.0)); // 1.0 divided by gamma constant
+	}
+
 	fragmentColor = retval;
 }
 
@@ -122,12 +130,29 @@ vec4 calculatePointLight(int idx, vec3 normal, vec3 viewDir, vec4 texDiff, vec4 
 
 
 	//specular PointLight
-	vec3 reflectDir = reflect(-pointLightDir, normal);
+	vec4 specular = vec4(0.0, 0.0, 0.0, 1.0);
 
-	float specComponent = pow(max(dot(viewDir, reflectDir), 0.0), Material.reflectivity * 128);
+	if (diffComponent > 0) {
+		// if diffComponent <= 0 means object is "behind" light
+		
+		float dotProd = 0.0;
 
-	vec4 specular = PointLights[idx].specular * (specComponent * texDiff);
+		if (blinn) { // calculate using blinn-phong
+			
+			vec3 halfwayDir = normalize(pointLightDir + viewDir);
 
+			dotProd = dot(normal, halfwayDir);
+		} else { // just using phong
+			
+			vec3 reflectDir = reflect(-pointLightDir, normal);
+
+			dotProd = dot(viewDir, reflectDir);
+		}
+
+		float specComponent = pow(max(dotProd, 0.0), Material.reflectivity * 128);
+
+		specular = PointLights[idx].specular * (specComponent * texSpec);
+	}
 
 	//attenuation
 	float distance = length(PointLights[idx].position - vsOutFragPos);
@@ -151,12 +176,29 @@ vec4 calculateDirectLight(vec3 normal, vec3 viewDir, vec4 texDiff, vec4 texSpec)
 
 
 	//specular 
-	vec3 reflectDir = reflect(-directLightDir, normal);
+	vec4 specular = vec4(0.0, 0.0, 0.0, 1.0);
 
-	float specComponent = pow(max(dot(viewDir, reflectDir), 0.0), Material.reflectivity * 128);
+	if (diffComponent > 0) {
+		// if diffComponent <= 0 means object is "behind" light
+		
+		float dotProd = 0.0;
 
-	vec4 specular = DirectLight.specular * (specComponent * texSpec);
+		if (blinn) { // calculate using blinn-phong
+			
+			vec3 halfwayDir = normalize(directLightDir + viewDir);
 
+			dotProd = dot(normal, halfwayDir);
+		} else { // just using phong
+			
+			vec3 reflectDir = reflect(-directLightDir, normal);
+
+			dotProd = dot(viewDir, reflectDir);
+		}
+
+		float specComponent = pow(max(dotProd, 0.0), Material.reflectivity * 128);
+
+		specular = DirectLight.specular * (specComponent * texSpec);
+	}
 
 	return vec4(ambient + diffuse + specular);
 }
@@ -179,10 +221,29 @@ vec4 calculateSpotLight(vec3 normal, vec3 viewDir, vec4 texDiff, vec4 texSpec) {
 
 
 		//specular SpotLight
-		vec3 reflectDir = reflect(-spotLightDir, normal);
+		vec4 specular = vec4(0.0, 0.0, 0.0, 1.0);
 
-		float specComponent = pow(max(dot(viewDir, reflectDir), 0.0), Material.reflectivity * 128);
-		vec4 specular = SpotLight.specular * (specComponent * texSpec);
+		if (diffComponent > 0) {
+			// if diffComponent <= 0 means object is "behind" light
+		
+			float dotProd = 0.0;
+
+			if (blinn) { // calculate using blinn-phong
+			
+				vec3 halfwayDir = normalize(spotLightDir + viewDir);
+
+				dotProd = dot(normal, halfwayDir);
+			} else { // just using phong
+			
+				vec3 reflectDir = reflect(-spotLightDir, normal);
+
+				dotProd = dot(viewDir, reflectDir);
+			}
+
+			float specComponent = pow(max(dotProd, 0.0), Material.reflectivity * 128);
+
+			specular = SpotLight.specular * (specComponent * texSpec);
+		}
 
 
 		//intensity
