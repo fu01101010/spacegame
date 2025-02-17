@@ -35,7 +35,7 @@ public:
 
 	
 	// main loop methods
-	void processInput(float dt);
+	void processInput(double deltaTime);
 
 	void update(); // update screen before each frame
 
@@ -62,8 +62,8 @@ public:
 	std::vector<spotLight*> spotLights;
 	unsigned int activeSpotLights;
 
-	dirLight* DirLight;
-	bool DirLightOn;
+	std::vector<directLight*> directLights;
+	unsigned int activeDirectLights;
 
 
 	// camera
@@ -72,7 +72,7 @@ public:
 
 	glm::mat4 view;
 	glm::mat4 projection;
-	glm::vec3 cameraPos;
+	glm::vec3 cameraPosition;
 
 protected:
 
@@ -86,8 +86,8 @@ protected:
 	float color[4];
 
 	// GLFW
-	int glfwContextVersionMajor;
-	int glfwContextVersionMinor;
+	int glfwCVMajor;
+	int glfwCVMinor;
 };
 
 #endif

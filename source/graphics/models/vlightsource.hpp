@@ -11,7 +11,7 @@ public:
 	glm::vec3 lightColor;
 
 	//Light strength
-	pointLight PointLight;
+	old_pointLight PointLight;
 
 	vlightsource() {}
 	vlightsource(

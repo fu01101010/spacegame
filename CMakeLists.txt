@@ -37,6 +37,7 @@ set ( ALL_LIBS
 
 add_executable(game 
 	"source/glad.c"
+	"source/utility/scene/scene.cpp"
 	"source/graphics/text/text.cpp"
 	"source/graphics/light.cpp"
 	"source/graphics/utility/material.cpp"
@@ -57,7 +58,6 @@ add_executable(game
 	"source/io/screen.cpp"
 	"source/utility/terrain/terrain.cpp"
 	"source/utility/math/mat.cpp"
-	"source/utility/scene/scene.cpp"
 	"source/main.cpp"
 )
 

@@ -35,6 +35,7 @@
 #include "../source/io/screen.h"
 #include "../source/io/camera.h"
 
+#include "../source/utility/scene/scene.h"
 #include "../source/utility/terrain/terrain.h"
 #include "../source/utility/math/mat.h"
 
@@ -44,7 +45,7 @@ void processInput(double deltaTime);
 
 
 // io here
-screen Screen;
+//screen Screen;
 
 double dx, dy;
 double scrollDX, scrollDY;
@@ -55,7 +56,7 @@ double currentTime = 0.0f;
 
 
 // temporary 
-camera camera::defaultCamera(glm::vec3(0.0f, 1.0f, 0.0f));
+camera cam(glm::vec3(0.0f));
 
 bool wireframeFlag = false;
 
@@ -73,11 +74,14 @@ bool gammaCorrection = false;
 FT_Library ft;
 ftText testText = ftText(32);
 
+scene Scene;
+
 // main
 int main() {
 
 	// glfw: initialize and configure
 
+	/*
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -86,9 +90,22 @@ int main() {
 #ifdef __APPLE__
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
+	*/
 
 	std::cout << "Hello, endless space!" << std::endl;
 
+	Scene = scene(3, 3, "game", 800, 600);
+
+	if (!Scene.init()) {
+
+		std::cout << "failed to open window" << std::endl;
+		glfwTerminate();
+
+		return -1;
+	}
+
+	
+	/*
 	// glfw window creation
 	if (!Screen.init()) {
 		
@@ -106,6 +123,7 @@ int main() {
 	}
 
 	Screen.setParameters();
+	*/
 
 	// init freetypelib
 	if (FT_Init_FreeType(&ft)) {
@@ -136,14 +154,20 @@ int main() {
 	ucube UCube = ucube(material::black_rubber, glm::vec3(5.0f, 0.0f, 0.0f), glm::vec3(1.0f));
 	UCube.init();
 
+	Scene.cameras.push_back(&cam);
+	Scene.activeCamera = 0;
+
 	coolmanny.load("/Users/ulysses/Desktop/source/projects/game/source/assets/models/coolmanny4/coolmanny.gltf");
 
-	m_spotLight uSpotLight = {
-		camera::defaultCamera.cameraPosition, camera::defaultCamera.cameraFront,
+	spotLight SpotLight = {
+		cam.cameraPosition, cam.cameraFront,
 		glm::cos(glm::radians(20.5f)), glm::cos(glm::radians(25.5f)),
 		1.0f, 0.0f, 0.0f,
 		glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), glm::vec4(1.0f), glm::vec4(1.0f)
 	};
+
+	Scene.spotLights.push_back(&SpotLight);
+	Scene.activeSpotLights = 1;
 
 	UTerrain.init();
 
@@ -152,7 +176,7 @@ int main() {
 	glm::mat4 projection = glm::mat4(1.0f);
 	glm::mat4 textProjection = glm::mat4(1.0f);
 
-	while (!Screen.shouldClose()) {
+	while (!Scene.shouldClose()) {
 		
 		// calculate deltaTime
 		currentTime = glfwGetTime();
@@ -162,58 +186,70 @@ int main() {
 		deltaTime = currentTime - lastFrame;
 		lastFrame = currentTime;
 
+		Scene.update();
+		
 		// process input
 		processInput(deltaTime);
 
 		// update screen
-		Screen.update();
+		//Screen.update();
 
 		view = glm::mat4(1.0f);
 		projection = glm::mat4(1.0f);
-		view = camera::defaultCamera.getViewMatrix();
+		view = cam.getViewMatrix();
 		projection = glm::perspective(
-			glm::radians(camera::defaultCamera.zoom), 
+			glm::radians(cam.zoom), 
 			(float)screen::SCR_WIDTH / (float)screen::SCR_HEIGHT, 0.1f, 100.0f
 		);
 		textProjection = glm::ortho(0.0f, (float)screen::SCR_WIDTH, 0.0f, (float)screen::SCR_HEIGHT);
 
 		// lighting
-		uSpotLight.position = camera::defaultCamera.cameraPosition;
-		uSpotLight.direction = camera::defaultCamera.cameraFront;
+		SpotLight.position = cam.cameraPosition;
+		SpotLight.direction = cam.cameraFront;
 
-		
 		// render (send data to shaders)		
 
 		weighedShader.activate();
 
-		weighedShader.set3flt("viewPos", camera::defaultCamera.cameraPosition);
+		weighedShader.set3flt("viewPos", cam.cameraPosition);
 
 		weighedShader.set_flt("nBone", currentBone);
 		weighedShader.setmat4("view", view);
 		weighedShader.setmat4("projection", projection);
 
+		/*
+		weighedShader.set_int("nSpotLights", 1);
+		*/
+
+		Scene.render(weighedShader);
+		
 		coolmanny.currentAnim = currentAnim;
 		coolmanny.render(weighedShader, currentTime);
 		
-		uSpotLight.render(weighedShader);
+		//SpotLight.render(weighedShader, 0);
 
 		uShader.activate();
 
-		uShader.set3flt("viewPos", camera::defaultCamera.cameraPosition);
+		uShader.set3flt("viewPos", cam.cameraPosition);
 		
 		uShader.setmat4("view", view);
 		uShader.setmat4("projection", projection);
 
+		/*
+		uShader.set_int("nSpotLights", 1);
+		*/
+		Scene.render(uShader);
+
 		uShader.setbool("blinn", blinn);
 		uShader.setbool("gamma", gammaCorrection);
 
-		uSpotLight.render(uShader);
+		SpotLight.render(uShader, 0);
 
 		garbage.render(uShader);
 
 		mShader.activate();
 
-		mShader.set3flt("viewPos", camera::defaultCamera.cameraPosition);
+		mShader.set3flt("viewPos", cam.cameraPosition);
 		
 		mShader.setmat4("view", view);
 		mShader.setmat4("projection", projection);
@@ -231,8 +267,11 @@ int main() {
 		//UTerrain.render(uShader);
 
 		// send new frame to window
+		/*
 		Screen.newFrame();
 		glfwPollEvents();
+		*/
+		Scene.newFrame();
 	}
 	
 	UTerrain.cleanUp();
@@ -241,9 +280,12 @@ int main() {
 	UCube.cleanUp();
 	testText.cleanUp();
 
+	Scene.cleanUp();
+
+
 	// glfw: terminate, clearing all previously allocated GLFW resources.
 
-	glfwTerminate();
+	//glfwTerminate();
 	return 0;
 }
 
@@ -251,36 +293,41 @@ int main() {
 
 void processInput(double deltaTime) {
 	
+	Scene.processInput(deltaTime);
+
 	if (keyboard::key(GLFW_KEY_ESCAPE)) {
 		
-		Screen.setShouldClose(true);
+		Scene.setShouldClose(true);
 	}
 
+	
 	// move camera
+	/*
 	if (keyboard::key(GLFW_KEY_E)) {
 
-		camera::defaultCamera.updateCameraPosition(cameraDirection::FORWARD, deltaTime);
+		cam.updateCameraPosition(cameraDirection::FORWARD, deltaTime);
 	}
 	if (keyboard::key(GLFW_KEY_D)) {
 
-		camera::defaultCamera.updateCameraPosition(cameraDirection::BACKWARD, deltaTime);
+		cam.updateCameraPosition(cameraDirection::BACKWARD, deltaTime);
 	}
 	if (keyboard::key(GLFW_KEY_F)) {
 
-		camera::defaultCamera.updateCameraPosition(cameraDirection::RIGHT, deltaTime);
+		cam.updateCameraPosition(cameraDirection::RIGHT, deltaTime);
 	}
 	if (keyboard::key(GLFW_KEY_S)) {
 
-		camera::defaultCamera.updateCameraPosition(cameraDirection::LEFT, deltaTime);
+		cam.updateCameraPosition(cameraDirection::LEFT, deltaTime);
 	}
 	if (keyboard::key(GLFW_KEY_SPACE)) {
 
-		camera::defaultCamera.updateCameraPosition(cameraDirection::UP, deltaTime);
+		cam.updateCameraPosition(cameraDirection::UP, deltaTime);
 	}
 	if (keyboard::key(GLFW_KEY_Z)) {
 		
-		camera::defaultCamera.updateCameraPosition(cameraDirection::DOWN, deltaTime);
+		cam.updateCameraPosition(cameraDirection::DOWN, deltaTime);
 	}
+	*/
 	
 	
 	if (keyboard::keyWentDn(GLFW_KEY_R)) {
@@ -316,22 +363,22 @@ void processInput(double deltaTime) {
 		
 		currentAnim -= 1;
 	}
-
+	/*
 	dx = mouse::getDX();
 	dy = mouse::getDY();
 
 	if (dx != 0 || dy != 0) {
 
-		camera::defaultCamera.updateCameraDirection(dx, dy);
+		cam.updateCameraDirection(dx, dy);
 	}
 
 	scrollDY = mouse::getScrollDY();
 
 	if (scrollDY != 0) {
 
-		camera::defaultCamera.updateCameraZoom(scrollDY);
+		cam.updateCameraZoom(scrollDY);
 	}
-	
+	*/
 
 	if (keyboard::key(GLFW_KEY_UP)) {
 
