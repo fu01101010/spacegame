@@ -45,7 +45,6 @@ void processInput(double deltaTime);
 
 
 // io here
-//screen Screen;
 
 double dx, dy;
 double scrollDX, scrollDY;
@@ -78,19 +77,6 @@ scene Scene;
 // main
 int main() {
 
-	// glfw: initialize and configure
-
-	/*
-	glfwInit();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-#ifdef __APPLE__
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#endif
-	
-	*/
 	std::cout << "Hello, endless space!" << std::endl;
 
 	Scene = scene(3, 3, "game", 800, 600);
@@ -103,29 +89,6 @@ int main() {
 
 		return -1;
 	}
-	
-
-	
-	
-	// glfw window creation
-	/*
-	if (!Screen.init()) {
-		
-		std::cout << "failed to open window" << std::endl;
-		glfwTerminate();
-
-		return -1;
-	}
-
-	// glad: load all OpenGL function pointers
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-		
-		std::cout << "failed to initialize GLAD" << std::endl;
-		return -1;
-	}
-
-	Screen.setParameters();
-	*/
 
 	// init freetypelib
 	if (FT_Init_FreeType(&ft)) {
@@ -187,14 +150,12 @@ int main() {
 
 		deltaTime = currentTime - lastFrame;
 		lastFrame = currentTime;
-
-		Scene.update();
 		
-		// process input
-		processInput(deltaTime);
-
 		// update screen
-		//Screen.update();
+		Scene.update();
+
+		// process the rest of the input
+		processInput(deltaTime);
 		
 		/*
 		view = glm::mat4(1.0f);
@@ -214,50 +175,21 @@ int main() {
 
 		// render (send data to shaders)		
 
-		weighedShader.activate();
-	
-		//weighedShader.set3flt("viewPos", cam.cameraPosition);
-		
-		weighedShader.set_flt("nBone", currentBone);
-		//weighedShader.setmat4("view", view);
-		//weighedShader.setmat4("projection", projection);
-
-		
-		//weighedShader.set_int("nSpotLights", 1);
-		
+		weighedShader.activate();		
+		weighedShader.set_flt("nBone", currentBone);		
 
 		Scene.render(weighedShader);
-		
 		coolmanny.currentAnim = currentAnim;
 		coolmanny.render(weighedShader, currentTime);
 		
-		//SpotLight.render(weighedShader, 0);
 
 		uShader.activate();
-
-		//uShader.set3flt("viewPos", cam.cameraPosition);
-		
-		//uShader.setmat4("view", view);
-		//uShader.setmat4("projection", projection);
-
-		//uShader.set_int("nSpotLights", 1);
-		
-
-		Scene.render(uShader);
-
 		uShader.setbool("blinn", blinn);
 		uShader.setbool("gamma", gammaCorrection);
 
-		//SpotLight.render(uShader, 0);
-
+		Scene.render(uShader);
 		garbage.render(uShader);
 
-		//mShader.activate();
-
-		//mShader.set3flt("viewPos", cam.cameraPosition);
-		
-		//mShader.setmat4("view", view);
-		//mShader.setmat4("projection", projection);
 
 		Scene.render(mShader);
 		UCube.render(mShader);
@@ -268,15 +200,9 @@ int main() {
 		testText.render(textShader, std::string("time: " + std::to_string(currentTime)), 10.0f, (float)screen::SCR_HEIGHT - 20.0f, glm::vec2(0.5f), glm::vec3(0.2f));
 		testText.render(textShader, std::string("fps: " + std::to_string(1/deltaTime)), 10.0f, (float)screen::SCR_HEIGHT - 35.0f, glm::vec2(0.5f), glm::vec3(0.2f));
 
-
-
 		//UTerrain.render(uShader);
 
-		// send new frame to window
-		
-		//Screen.newFrame();
-		//glfwPollEvents();
-		
+		// send new frame to window		
 		Scene.newFrame();
 	}
 	
@@ -287,9 +213,6 @@ int main() {
 	testText.cleanUp();
 
 	Scene.cleanUp();
-
-
-	// glfw: terminate, clearing all previously allocated GLFW resources.
 
 	glfwTerminate();
 	return 0;
@@ -305,37 +228,6 @@ void processInput(double deltaTime) {
 		
 		Scene.setShouldClose(true);
 	}
-
-	
-	// move camera
-	
-	/*
-	if (keyboard::key(GLFW_KEY_E)) {
-
-		cam.updateCameraPosition(cameraDirection::FORWARD, deltaTime);
-	}
-	if (keyboard::key(GLFW_KEY_D)) {
-
-		cam.updateCameraPosition(cameraDirection::BACKWARD, deltaTime);
-	}
-	if (keyboard::key(GLFW_KEY_F)) {
-
-		cam.updateCameraPosition(cameraDirection::RIGHT, deltaTime);
-	}
-	if (keyboard::key(GLFW_KEY_S)) {
-
-		cam.updateCameraPosition(cameraDirection::LEFT, deltaTime);
-	}
-	if (keyboard::key(GLFW_KEY_SPACE)) {
-
-		cam.updateCameraPosition(cameraDirection::UP, deltaTime);
-	}
-	if (keyboard::key(GLFW_KEY_Z)) {
-		
-		cam.updateCameraPosition(cameraDirection::DOWN, deltaTime);
-	}
-	*/
-	
 	
 	if (keyboard::keyWentDn(GLFW_KEY_R)) {
 		
@@ -371,23 +263,6 @@ void processInput(double deltaTime) {
 		currentAnim -= 1;
 	}
 	
-	/*
-	dx = mouse::getDX();
-	dy = mouse::getDY();
-
-	if (dx != 0 || dy != 0) {
-
-		cam.updateCameraDirection(dx, dy);
-	}
-
-	scrollDY = mouse::getScrollDY();
-
-	if (scrollDY != 0) {
-
-		cam.updateCameraZoom(scrollDY);
-	}
-	*/
-
 	if (keyboard::key(GLFW_KEY_UP)) {
 
 		coolmanny.position.x += 0.05f;
