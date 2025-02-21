@@ -69,8 +69,8 @@ weighedModel coolmanny(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f), false);
 bool blinn = false;
 bool gammaCorrection = false;
 
-FT_Library ft;
-ftText testText = ftText(32);
+//FT_Library ft;
+//ftText text = ftText(32);
 
 scene Scene;
 
@@ -89,21 +89,6 @@ int main() {
 
 		return -1;
 	}
-
-	// init freetypelib
-	if (FT_Init_FreeType(&ft)) {
-		
-		std::cout << "failed to initialize freetype lib" << std::endl;
-		return -1;
-	}
-
-	if (!testText.load(ft, "/Users/ulysses/Desktop/source/projects/game/source/assets/fonts/mac/FiraCode-Medium.ttf")) {
-		
-		std::cout << "failed to load font" << std::endl;
-		return -1;
-	}
-
-	FT_Done_FreeType(ft);
 
 	// shaders
 	shader mShader("/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/core/ucore.vs", "/Users/ulysses/Desktop/source/projects/game/source/assets/shaders/core/ucore.fs");
@@ -197,8 +182,8 @@ int main() {
 		// text!!!
 		textShader.activate();
 		textShader.setmat4("projection", textProjection);
-		testText.render(textShader, std::string("time: " + std::to_string(currentTime)), 10.0f, (float)screen::SCR_HEIGHT - 20.0f, glm::vec2(0.5f), glm::vec3(0.2f));
-		testText.render(textShader, std::string("fps: " + std::to_string(1/deltaTime)), 10.0f, (float)screen::SCR_HEIGHT - 35.0f, glm::vec2(0.5f), glm::vec3(0.2f));
+		Scene.glyph.render(textShader, std::string("time: " + std::to_string(currentTime)), 10.0f, (float)screen::SCR_HEIGHT - 20.0f, glm::vec2(0.5f), glm::vec3(0.2f));
+		Scene.glyph.render(textShader, std::string("fps: " + std::to_string(1/deltaTime)), 10.0f, (float)screen::SCR_HEIGHT - 35.0f, glm::vec2(0.5f), glm::vec3(0.2f));
 
 		//UTerrain.render(uShader);
 
@@ -210,7 +195,6 @@ int main() {
 	garbage.cleanUp();
 	coolmanny.cleanUp();
 	UCube.cleanUp();
-	testText.cleanUp();
 
 	Scene.cleanUp();
 

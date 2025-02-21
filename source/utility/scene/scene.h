@@ -8,8 +8,14 @@
 
 #include <glm/glm.hpp>
 
+#include <ft2build.h>
+#include <freetype/freetype.h>
+
 #include "../../graphics/shader.h"
 #include "../../graphics/light.h"
+
+#include "../../graphics/text/text.h"
+
 
 #include "../../io/camera.h"
 #include "../../io/keyboard.h"
@@ -74,6 +80,8 @@ public:
 	glm::mat4 projection;
 	glm::vec3 cameraPosition;
 
+	FT_Library ft;
+	ftText glyph;
 protected:
 
 	// window object

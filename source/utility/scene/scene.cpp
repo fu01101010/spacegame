@@ -13,6 +13,8 @@ scene::scene(int glfwCVMajor, int glfwCVMinor, const char* title, unsigned int _
 	height = _height;
 
 	setWindowColor(0.7f, 0.7f, 0.7f, 1.0f);
+
+	glyph = ftText(32);
 }
 
 
@@ -61,6 +63,21 @@ bool scene::init() {
 		glfwTerminate();
 		return false;
 	}
+
+	// init freetypelib
+	if (FT_Init_FreeType(&ft)) {
+		
+		std::cout << "failed to initialize freetype lib" << std::endl;
+		return -1;
+	}
+
+	if (!glyph.load(ft, "/Users/ulysses/Desktop/source/projects/game/source/assets/fonts/mac/FiraCode-Medium.ttf")) {
+		
+		std::cout << "failed to load font" << std::endl;
+		return -1;
+	}
+
+	FT_Done_FreeType(ft);
 
 	// setup screen
 	glViewport(0, 0, width, height);
@@ -221,6 +238,8 @@ void scene::render(shader Shader) {
 
 
 void scene::cleanUp() {
+
+	glyph.cleanUp();
 
 	glfwTerminate();
 }
