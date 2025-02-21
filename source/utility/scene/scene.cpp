@@ -59,7 +59,7 @@ bool scene::init() {
 
 		std::cout << "failed to initialize GLAD" << std::endl;
 		glfwTerminate();
-		return -1;
+		return false;
 	}
 
 	// setup screen

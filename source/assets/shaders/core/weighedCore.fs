@@ -28,7 +28,7 @@ struct pointLight {
 uniform pointLight PointLights[maxPointLights];
 uniform int nPointLights;
 
-#define maxDirectLights 3
+#define maxDirectLights 10
 struct directLight {
 
 	vec3 direction;
@@ -39,6 +39,7 @@ struct directLight {
 };
 uniform directLight DirectLights[maxDirectLights];
 uniform int nDirectLights;
+
 
 #define maxSpotLights 10
 struct spotLight {
@@ -98,17 +99,18 @@ void main() {
 		texSpec = texture(specular0, vsOutTextureCoords);
 	}
 	
-	vec4 retval;
+	vec4 retval = vec4(0.0);
+	//vec4 retval; // LOLLLL
 
 	//DirectLight
 	for (int i = 0; i < nDirectLights; ++i) {
-
+	
 		retval += calculateDirectLight(i, normal, viewDir, texDiff, texSpec);
 	}
 
 	//PointLight
 	for (int i = 0; i < nPointLights; ++i) {
-
+	
 		retval += calculatePointLight(i, normal, viewDir, texDiff, texSpec);
 	}
 

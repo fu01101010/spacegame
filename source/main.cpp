@@ -54,7 +54,6 @@ double deltaTime = 0.0f; // time inbetween frames
 double lastFrame = 0.0f; // time of last frame
 double currentTime = 0.0f;
 
-
 // temporary 
 camera cam(glm::vec3(0.0f));
 
@@ -90,12 +89,13 @@ int main() {
 #ifdef __APPLE__
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
+	
 	*/
-
 	std::cout << "Hello, endless space!" << std::endl;
 
 	Scene = scene(3, 3, "game", 800, 600);
 
+	
 	if (!Scene.init()) {
 
 		std::cout << "failed to open window" << std::endl;
@@ -103,10 +103,12 @@ int main() {
 
 		return -1;
 	}
+	
 
 	
-	/*
+	
 	// glfw window creation
+	/*
 	if (!Screen.init()) {
 		
 		std::cout << "failed to open window" << std::endl;
@@ -132,7 +134,7 @@ int main() {
 		return -1;
 	}
 
-	if (!testText.load(ft, "/Users/ulysses/Desktop/source/projects/game/source/assets/fonts/mac/Monaco.ttf")) {
+	if (!testText.load(ft, "/Users/ulysses/Desktop/source/projects/game/source/assets/fonts/mac/FiraCode-Medium.ttf")) {
 		
 		std::cout << "failed to load font" << std::endl;
 		return -1;
@@ -193,7 +195,8 @@ int main() {
 
 		// update screen
 		//Screen.update();
-
+		
+		/*
 		view = glm::mat4(1.0f);
 		projection = glm::mat4(1.0f);
 		view = cam.getViewMatrix();
@@ -201,6 +204,8 @@ int main() {
 			glm::radians(cam.zoom), 
 			(float)screen::SCR_WIDTH / (float)screen::SCR_HEIGHT, 0.1f, 100.0f
 		);
+		*/
+		
 		textProjection = glm::ortho(0.0f, (float)screen::SCR_WIDTH, 0.0f, (float)screen::SCR_HEIGHT);
 
 		// lighting
@@ -210,16 +215,16 @@ int main() {
 		// render (send data to shaders)		
 
 		weighedShader.activate();
-
-		weighedShader.set3flt("viewPos", cam.cameraPosition);
-
+	
+		//weighedShader.set3flt("viewPos", cam.cameraPosition);
+		
 		weighedShader.set_flt("nBone", currentBone);
-		weighedShader.setmat4("view", view);
-		weighedShader.setmat4("projection", projection);
+		//weighedShader.setmat4("view", view);
+		//weighedShader.setmat4("projection", projection);
 
-		/*
-		weighedShader.set_int("nSpotLights", 1);
-		*/
+		
+		//weighedShader.set_int("nSpotLights", 1);
+		
 
 		Scene.render(weighedShader);
 		
@@ -230,30 +235,31 @@ int main() {
 
 		uShader.activate();
 
-		uShader.set3flt("viewPos", cam.cameraPosition);
+		//uShader.set3flt("viewPos", cam.cameraPosition);
 		
-		uShader.setmat4("view", view);
-		uShader.setmat4("projection", projection);
+		//uShader.setmat4("view", view);
+		//uShader.setmat4("projection", projection);
 
-		/*
-		uShader.set_int("nSpotLights", 1);
-		*/
+		//uShader.set_int("nSpotLights", 1);
+		
+
 		Scene.render(uShader);
 
 		uShader.setbool("blinn", blinn);
 		uShader.setbool("gamma", gammaCorrection);
 
-		SpotLight.render(uShader, 0);
+		//SpotLight.render(uShader, 0);
 
 		garbage.render(uShader);
 
-		mShader.activate();
+		//mShader.activate();
 
-		mShader.set3flt("viewPos", cam.cameraPosition);
+		//mShader.set3flt("viewPos", cam.cameraPosition);
 		
-		mShader.setmat4("view", view);
-		mShader.setmat4("projection", projection);
+		//mShader.setmat4("view", view);
+		//mShader.setmat4("projection", projection);
 
+		Scene.render(mShader);
 		UCube.render(mShader);
 
 		// text!!!
@@ -267,10 +273,10 @@ int main() {
 		//UTerrain.render(uShader);
 
 		// send new frame to window
-		/*
-		Screen.newFrame();
-		glfwPollEvents();
-		*/
+		
+		//Screen.newFrame();
+		//glfwPollEvents();
+		
 		Scene.newFrame();
 	}
 	
@@ -285,7 +291,7 @@ int main() {
 
 	// glfw: terminate, clearing all previously allocated GLFW resources.
 
-	//glfwTerminate();
+	glfwTerminate();
 	return 0;
 }
 
@@ -302,6 +308,7 @@ void processInput(double deltaTime) {
 
 	
 	// move camera
+	
 	/*
 	if (keyboard::key(GLFW_KEY_E)) {
 
@@ -363,6 +370,7 @@ void processInput(double deltaTime) {
 		
 		currentAnim -= 1;
 	}
+	
 	/*
 	dx = mouse::getDX();
 	dy = mouse::getDY();

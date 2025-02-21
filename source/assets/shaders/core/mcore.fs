@@ -40,6 +40,7 @@ struct directLight {
 uniform directLight DirectLights[maxDirectLights];
 uniform int nDirectLights;
 
+
 #define maxSpotLights 10
 struct spotLight {
 
@@ -57,9 +58,9 @@ struct spotLight {
 	vec4 diffuse;
 	vec4 specular;
 };
+
 uniform spotLight SpotLights[maxSpotLights];
 uniform int nSpotLights;
-
 
 uniform int noTex;
 
@@ -98,7 +99,7 @@ void main() {
 		texSpec = texture(specular0, vsOutTextureCoords);
 	}
 
-	vec4 retval;
+	vec4 retval = vec4(0.0);
 
 	//DirectLight
 	for (int i = 0; i < nDirectLights; ++i) {
